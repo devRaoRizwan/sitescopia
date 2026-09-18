@@ -203,8 +203,8 @@ code {
   box-shadow: var(--shadow);
 }
 .url-field:focus-within {
-  border-color: var(--brand-500);
-  box-shadow: 0 0 0 4px var(--brand-50);
+  border-color: var(--line-strong);
+  box-shadow: var(--shadow);
 }
 
 .url-prefix {
