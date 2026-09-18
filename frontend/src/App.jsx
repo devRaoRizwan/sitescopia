@@ -11,20 +11,24 @@ import AdSlot from './components/AdSlot'
 import Sidebar from './components/Sidebar'
 
 const POLL_INTERVAL_MS = 1500
-const SETTLED = ['done', 'failed']
+const SETTLED = ['done', 'failed', 'blocked']
 
 export default function App() {
   const [jobId, setJobId] = useState(null)
+  const [jobToken, setJobToken] = useState(null)
 
   const submit = useMutation({
     mutationFn: startAnalysis,
-    onSuccess: (job) => setJobId(job.id),
+    onSuccess: (job) => {
+      setJobId(job.id)
+      setJobToken(job.access_token)
+    },
   })
 
   const job = useQuery({
-    queryKey: ['analysis', jobId],
-    queryFn: () => getAnalysis(jobId),
-    enabled: Boolean(jobId),
+    queryKey: ['analysis', jobId, jobToken],
+    queryFn: () => getAnalysis(jobId, jobToken),
+    enabled: Boolean(jobId && jobToken),
     refetchInterval: (query) =>
       SETTLED.includes(query.state.data?.status) ? false : POLL_INTERVAL_MS,
   })
@@ -35,6 +39,7 @@ export default function App() {
 
   const analyze = (url) => {
     setJobId(null)
+    setJobToken(null)
     submit.mutate(url)
   }
 

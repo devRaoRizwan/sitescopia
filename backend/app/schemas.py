@@ -206,6 +206,7 @@ class AnalysisResult(BaseModel):
 
 class AnalysisJob(BaseModel):
     id: str
+    access_token: str
     url: str
     status: Status
     created_at: datetime

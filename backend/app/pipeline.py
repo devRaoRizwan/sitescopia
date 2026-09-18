@@ -36,7 +36,8 @@ async def run(job_id: str, url: str) -> None:
             scoring.build_result(page, outcomes, diagnostics, domain_info, contacts),
         )
     except FetchError as exc:
-        store.mark_failed(job_id, str(exc))
+        log.info("Analysis %s could not fetch the page: %s", job_id, exc)
+        store.mark_failed(job_id, "The page could not be fetched or analyzed.")
     except Exception as exc:
         log.exception("Analysis %s crashed", job_id)
-        store.mark_failed(job_id, f"Unexpected error while analyzing: {exc}")
+        store.mark_failed(job_id, "The analysis failed unexpectedly. Please try again later.")

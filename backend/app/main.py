@@ -1,8 +1,10 @@
-from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi import BackgroundTasks, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from . import analyzers, pipeline, store
 from .config import settings
+from .rate_limit import SlidingWindowRateLimiter
 from .safety import UnsafeURL, validate
 from .schemas import AnalysisJob, AnalyzeRequest, CheckInventory
 
@@ -21,6 +23,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+analysis_rate_limiter = SlidingWindowRateLimiter(
+    settings.analysis_rate_limit,
+    settings.rate_limit_window,
+    settings.rate_limit_max_keys,
+)
+
+
+def client_key(request: Request) -> str:
+    if settings.trust_proxy_headers:
+        forwarded_for = request.headers.get("x-forwarded-for")
+        if forwarded_for:
+            return forwarded_for.split(",", 1)[0].strip()
+    return request.client.host if request.client else "unknown"
+
 
 @app.get("/api/health")
 async def health() -> dict[str, str]:
@@ -28,7 +44,28 @@ async def health() -> dict[str, str]:
 
 
 @app.post("/api/analyses", status_code=202, response_model=AnalysisJob)
-async def create_analysis(request: AnalyzeRequest, background: BackgroundTasks) -> AnalysisJob:
+async def create_analysis(
+    request: AnalyzeRequest,
+    background: BackgroundTasks,
+    http_request: Request,
+) -> AnalysisJob | JSONResponse:
+    allowed, retry_after = analysis_rate_limiter.check(client_key(http_request))
+    if not allowed:
+        return JSONResponse(
+            status_code=429,
+            content={
+                "detail": "Analysis rate limit exceeded. Try again later.",
+                "retry_after": retry_after,
+            },
+            headers={"Retry-After": str(retry_after)},
+        )
+
+    if store.active_count() >= settings.max_active_analyses:
+        raise HTTPException(
+            status_code=503,
+            detail="The analysis queue is full. Try again later.",
+        )
+
     try:
         url = validate(request.url)
     except UnsafeURL as exc:
@@ -40,16 +77,11 @@ async def create_analysis(request: AnalyzeRequest, background: BackgroundTasks) 
 
 
 @app.get("/api/analyses/{job_id}", response_model=AnalysisJob)
-async def get_analysis(job_id: str) -> AnalysisJob:
-    job = store.get(job_id)
+async def get_analysis(job_id: str, x_analysis_token: str | None = Header(default=None)) -> AnalysisJob:
+    job = store.get(job_id, x_analysis_token or "")
     if not job:
-        raise HTTPException(status_code=404, detail="No analysis with that id.")
+        raise HTTPException(status_code=404, detail="Analysis not found.")
     return job
-
-
-@app.get("/api/analyses", response_model=list[AnalysisJob])
-async def list_analyses(limit: int = 20) -> list[AnalysisJob]:
-    return store.recent(min(limit, 50))
 
 
 @app.get("/api/checks", response_model=CheckInventory)

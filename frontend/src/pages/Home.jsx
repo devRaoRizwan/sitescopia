@@ -29,14 +29,21 @@ export default function Home() {
   })
 
   const [jobId, setJobId] = useState(null)
+  const [jobToken, setJobToken] = useState(null)
 
-  const submit = useMutation({ mutationFn: startAnalysis, onSuccess: (job) => setJobId(job.id) })
+  const submit = useMutation({
+    mutationFn: startAnalysis,
+    onSuccess: (job) => {
+      setJobId(job.id)
+      setJobToken(job.access_token)
+    },
+  })
   const checks = useQuery({ queryKey: ['checks'], queryFn: getChecks, staleTime: Infinity })
 
   const job = useQuery({
-    queryKey: ['analysis', jobId],
-    queryFn: () => getAnalysis(jobId),
-    enabled: Boolean(jobId),
+    queryKey: ['analysis', jobId, jobToken],
+    queryFn: () => getAnalysis(jobId, jobToken),
+    enabled: Boolean(jobId && jobToken),
     refetchInterval: (query) =>
       SETTLED.includes(query.state.data?.status) ? false : POLL_INTERVAL_MS,
   })
@@ -47,6 +54,7 @@ export default function Home() {
 
   const analyze = (url) => {
     setJobId(null)
+    setJobToken(null)
     submit.mutate(url)
   }
 

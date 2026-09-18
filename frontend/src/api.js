@@ -1,5 +1,7 @@
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '')
+
 async function request(path, options) {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   })
@@ -13,7 +15,10 @@ async function request(path, options) {
 export const startAnalysis = (url) =>
   request('/api/analyses', { method: 'POST', body: JSON.stringify({ url }) })
 
-export const getAnalysis = (id) => request(`/api/analyses/${id}`)
+export const getAnalysis = (id, accessToken) =>
+  request(`/api/analyses/${id}`, {
+    headers: { 'X-Analysis-Token': accessToken },
+  })
 
 export const listAnalyses = () => request('/api/analyses?limit=10')
 

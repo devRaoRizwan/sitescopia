@@ -14,6 +14,11 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
     max_stored_jobs: int = 200
     api_docs_enabled: bool = False
+    analysis_rate_limit: int = 10
+    rate_limit_window: int = 60
+    rate_limit_max_keys: int = 10000
+    max_active_analyses: int = 4
+    trust_proxy_headers: bool = False
 
 
     slow_response_ms: int = 1500

@@ -1,3 +1,4 @@
+import secrets
 import uuid
 from datetime import datetime, timezone
 
@@ -13,7 +14,13 @@ def utc_now() -> datetime:
 
 
 def create(url: str) -> AnalysisJob:
-    job = AnalysisJob(id=uuid.uuid4().hex[:12], url=url, status=Status.QUEUED, created_at=utc_now())
+    job = AnalysisJob(
+        id=uuid.uuid4().hex[:12],
+        access_token=secrets.token_urlsafe(32),
+        url=url,
+        status=Status.QUEUED,
+        created_at=utc_now(),
+    )
     jobs[job.id] = job
     order.append(job.id)
 
@@ -23,8 +30,15 @@ def create(url: str) -> AnalysisJob:
     return job
 
 
-def get(job_id: str) -> AnalysisJob | None:
-    return jobs.get(job_id)
+def get(job_id: str, access_token: str) -> AnalysisJob | None:
+    job = jobs.get(job_id)
+    if not job or not secrets.compare_digest(job.access_token, access_token):
+        return None
+    return job
+
+
+def active_count() -> int:
+    return sum(job.status in {Status.QUEUED, Status.RUNNING} for job in jobs.values())
 
 
 def recent(limit: int = 20) -> list[AnalysisJob]:
