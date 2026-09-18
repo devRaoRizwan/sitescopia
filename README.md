@@ -1,42 +1,213 @@
 # SiteScopia
 
-SiteScopia is an evidence-led website analyzer. Give it one public URL and it checks the page for SEO, accessibility, security, performance, content, domain, and contact signals.
+SiteScopia is an evidence-led website analyzer. Enter a public URL and get a clear report covering SEO, accessibility, security, performance, content, domain, and contact signals.
 
-The report does more than return a score. Each finding explains:
+Instead of returning only a score, SiteScopia shows the finding, explains why it matters, displays the evidence, and suggests a practical fix.
 
-- what was found
-- why it matters
-- the evidence behind the result
-- a practical next step
+## Product Overview
 
-SiteScopia is intentionally honest about its limits. It analyzes the HTML and HTTP response it can fetch, does not execute JavaScript, does not crawl a site, and refuses private or internal network addresses.
+SiteScopia is designed for developers, designers, SEO specialists, and site owners who want a fast first review of a public webpage.
 
-## What It Does
+It answers questions such as:
 
-The analyzer runs a single URL through this pipeline:
+- Is the page structured clearly for search engines?
+- Are important accessibility basics present?
+- Are security headers and HTTPS configured?
+- Is the response slow or unusually large?
+- Are domain, DNS, and contact signals available?
+- What should be fixed first?
+
+The tool analyzes one URL at a time. It does not crawl an entire website or execute JavaScript.
+
+## How It Works
 
 ```text
-validate URL -> fetch page -> parse facts -> enrich domain/contact data
-             -> run checks -> calculate scores -> return report
+User enters URL
+      |
+      v
+Frontend sends analysis request
+      |
+      v
+Backend validates URL and blocks private/internal targets
+      |
+      v
+Backend fetches the public page
+      |
+      v
+HTML is parsed into reusable page facts
+      |
+      +--> Domain and DNS enrichment
+      +--> Contact and social extraction
+      |
+      v
+Independent analyzers run their checks
+      |
+      v
+Scores and findings are stored in the job
+      |
+      v
+Frontend polls the job and renders the report
 ```
 
-The frontend submits a URL, receives a job id, and polls until the background analysis is complete. The finished report groups findings by category and severity.
+## Frontend
 
-## Requirements
+The frontend is a React and Vite application located in [`frontend/`](frontend/).
 
-- Python 3.13 or newer
-- Node.js 18 or newer
-- npm
-- `uv` (recommended) or a standard Python virtual environment
-- A Chromium-based browser only if you want frontend prerendering during a production build
+It is responsible for:
 
-## Run Locally
+- URL input and validation feedback
+- Starting an analysis
+- Polling the backend job status
+- Rendering progress and blocked states
+- Displaying scores, categories, findings, evidence, and recommendations
+- Showing domain and contact insights
+- Providing routed pages such as About, Checks, Privacy, and Terms
+- Managing SEO metadata and prerendered pages
+- Sending optional Vercel Web Analytics events
 
-The backend and frontend run as two separate processes.
+Important frontend areas:
 
-### 1. Start the backend
+| Location | Responsibility |
+| --- | --- |
+| [`frontend/src/main.jsx`](frontend/src/main.jsx) | React entry point and providers |
+| [`frontend/src/api.js`](frontend/src/api.js) | Backend API requests and job polling |
+| [`frontend/src/App.jsx`](frontend/src/App.jsx) | Application shell and report flow |
+| [`frontend/src/components/`](frontend/src/components/) | Reusable interface components |
+| [`frontend/src/pages/`](frontend/src/pages/) | Routed content pages |
+| [`frontend/src/styles.css`](frontend/src/styles.css) | Shared visual system and responsive layout |
+| [`frontend/scripts/prerender.mjs`](frontend/scripts/prerender.mjs) | Generates HTML for public routes |
 
-From the repository root:
+## Backend
+
+The backend is a FastAPI application located in [`backend/`](backend/).
+
+It is responsible for:
+
+- Receiving analysis requests
+- Validating public URLs
+- Blocking SSRF targets and unsafe redirects
+- Fetching HTML with timeout, size, and redirect limits
+- Parsing the page once into structured facts
+- Enriching results with RDAP, DNS, contact, and social data
+- Running independent analyzers
+- Calculating category and overall scores
+- Storing short-lived analysis jobs in memory
+- Returning results to the frontend through a JSON API
+
+Important backend areas:
+
+| Location | Responsibility |
+| --- | --- |
+| [`backend/app/main.py`](backend/app/main.py) | FastAPI routes and request controls |
+| [`backend/app/safety.py`](backend/app/safety.py) | URL validation and SSRF protection |
+| [`backend/app/fetcher.py`](backend/app/fetcher.py) | Safe page fetching and redirect checks |
+| [`backend/app/parser.py`](backend/app/parser.py) | HTML parsing into page facts |
+| [`backend/app/analyzers/`](backend/app/analyzers/) | SEO, security, accessibility, and other checks |
+| [`backend/app/enrichment/`](backend/app/enrichment/) | Domain, DNS, contact, and social enrichment |
+| [`backend/app/pipeline.py`](backend/app/pipeline.py) | Runs the analysis stages |
+| [`backend/app/scoring.py`](backend/app/scoring.py) | Builds scores and report results |
+| [`backend/app/store.py`](backend/app/store.py) | In-memory job storage |
+| [`backend/app/rate_limit.py`](backend/app/rate_limit.py) | Analysis request limiting |
+| [`backend/requirements.txt`](backend/requirements.txt) | Python dependencies |
+
+## Request and Job Flow
+
+Analysis requests run as background jobs so a slow target page does not keep the initial HTTP request open.
+
+1. The frontend sends `POST /api/analyses` with a URL.
+2. The backend validates the URL and checks the request rate limit.
+3. The backend creates a private job id and access token.
+4. The analysis runs in the background.
+5. The frontend polls `GET /api/analyses/{id}` using `X-Analysis-Token`.
+6. The backend returns queued, running, done, failed, or blocked status.
+7. The frontend renders the completed report.
+
+The API also exposes:
+
+```text
+GET  /api/health
+POST /api/analyses
+GET  /api/analyses/{id}
+GET  /api/checks
+```
+
+Analysis results are protected by the private token returned when the job is created. There is no public endpoint for listing other users' jobs.
+
+## Security and Reliability
+
+The backend includes protections for public deployment:
+
+- Private, loopback, link-local, reserved, and internal addresses are rejected.
+- Every redirect destination is validated before it is fetched.
+- Fetches have timeout, response-size, and redirect-count limits.
+- Analysis creation is rate limited per client.
+- The number of active analyses is bounded.
+- Job results require a private access token.
+- Bot challenges and error pages are marked as blocked instead of being scored.
+- Detailed internal exceptions are logged server-side but generic errors are returned to users.
+- CORS is configured for the production frontend origin.
+
+## Deployment
+
+The recommended production setup uses both services from the same GitHub repository:
+
+```text
+GitHub repository
+├── frontend/  -> Vercel
+└── backend/   -> Render
+```
+
+### Vercel frontend
+
+Set the Vercel root directory to `frontend`:
+
+```text
+Framework: Vite
+Build command: npm run build
+Output directory: dist
+```
+
+Production environment variables:
+
+```env
+ VITE_API_URL=https://your-backend-service.example
+ VITE_SITE_URL=https://your-frontend-domain.example
+VITE_SHOW_ADVERTISEMENT=false
+```
+
+### Render backend
+
+Set the Render root directory to `backend`:
+
+```text
+Build command: pip install -r requirements.txt
+Start command: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+Important Render environment variables:
+
+```env
+CORS_ORIGINS=["https://your-frontend-domain.example"]
+DOMAIN_LOOKUP_ENABLED=true
+API_DOCS_ENABLED=false
+ANALYSIS_RATE_LIMIT=10
+RATE_LIMIT_WINDOW=60
+RATE_LIMIT_MAX_KEYS=10000
+MAX_ACTIVE_ANALYSES=4
+TRUST_PROXY_HEADERS=false
+```
+
+Confirm the backend is healthy at:
+
+```text
+https://your-backend-service.example/api/health
+```
+
+More detailed setup, configuration, deployment, troubleshooting, and development guidance is available in [`TECHNICAL.md`](TECHNICAL.md).
+
+## Local Development
+
+Start the backend:
 
 ```bash
 cd backend
@@ -46,23 +217,7 @@ cp .env.example .env
 .venv/bin/uvicorn app.main:app --reload
 ```
 
-The API is available at `http://127.0.0.1:8000`.
-
-Check that it is running:
-
-```bash
-curl http://127.0.0.1:8000/api/health
-```
-
-Expected response:
-
-```json
-{"status":"ok"}
-```
-
-### 2. Start the frontend
-
-Open a second terminal from the repository root:
+Start the frontend in a second terminal:
 
 ```bash
 cd frontend
@@ -70,248 +225,17 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173).
+Open [http://localhost:5173](http://localhost:5173). Vite proxies local `/api` requests to the backend.
 
-Vite proxies `/api/*` to `http://127.0.0.1:8000`, so no frontend API URL is required for local development.
+## Limitations
 
-## Try the API Directly
-
-Create an analysis:
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/analyses \
-  -H 'Content-Type: application/json' \
-  -d '{"url":"https://example.com"}'
-```
-
-The API responds with `202 Accepted` and a job object. Use its `id` to poll the result:
-
-```bash
-curl http://127.0.0.1:8000/api/analyses/<job-id>
-```
-
-Useful endpoints:
-
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `GET` | `/api/health` | Check whether the backend is alive |
-| `POST` | `/api/analyses` | Start an analysis; returns `202` and a job id |
-| `GET` | `/api/analyses/{id}` | Read a job and its completed result |
-| `GET` | `/api/analyses` | List recent in-memory jobs |
-| `GET` | `/api/checks` | Return the check inventory and total count |
-
-FastAPI's interactive documentation is disabled by default. For local API development, set `API_DOCS_ENABLED=true` in `backend/.env`, restart the backend, and open `/docs` or `/redoc`.
-
-## Configuration
-
-Copy `backend/.env.example` to `backend/.env`. Environment variables override the defaults in `app/config.py`.
-
-| Variable | Default | Description |
-| --- | ---: | --- |
-| `FETCH_TIMEOUT` | `15` | Maximum seconds allowed for the page fetch |
-| `FETCH_MAX_BYTES` | `5242880` | Maximum response body size accepted by the fetcher |
-| `FETCH_MAX_REDIRECTS` | `5` | Maximum redirect hops followed |
-| `USER_AGENT` | `SiteScopia/0.1` | User-Agent sent with page requests |
-| `RDAP_TIMEOUT` | `10` | Maximum seconds for registry lookup |
-| `DOMAIN_LOOKUP_ENABLED` | `true` | Enable or disable RDAP and DNS enrichment |
-| `CORS_ORIGINS` | localhost origins | JSON list of allowed frontend origins |
-| `MAX_STORED_JOBS` | `200` | Number of recent jobs kept in memory |
-| `API_DOCS_ENABLED` | `false` | Enable Swagger UI, ReDoc, and OpenAPI output |
-| `SLOW_RESPONSE_MS` | `1500` | Threshold for a slow-response warning |
-| `VERY_SLOW_RESPONSE_MS` | `3000` | Threshold for a very-slow-response error |
-| `MAX_HTML_BYTES` | `153600` | HTML size threshold used by checks |
-| `MAX_EXTERNAL_SCRIPTS` | `15` | External script count threshold |
-
-`CORS_ORIGINS` uses JSON syntax, for example:
-
-```env
-CORS_ORIGINS=["http://localhost:5173","https://app.example.com"]
-```
-
-## Production Frontend Build
-
-Build the frontend and generate prerendered HTML for every public route:
-
-```bash
-cd frontend
-npm run build
-```
-
-The command runs Vite and then `scripts/prerender.mjs`. The result is written to `frontend/dist`.
-
-Preview the built site with the repository's production-like server:
-
-```bash
-npm run preview
-```
-
-The preview server handles route directories, compression, cache headers, and security headers. `npm run preview:vite` is also available for a basic Vite preview, but it does not reproduce the route handling of the production-like server.
-
-### Prerendering requirements
-
-Prerendering uses `puppeteer-core`. If Chrome is not found, the build continues with a warning and the prerender step is skipped. Set `CHROME_PATH` when Chrome is installed in a non-standard location.
-
-If the backend is not running at `http://127.0.0.1:8000`, set `PRERENDER_API` before building. The checks page uses the API while it is prerendered.
-
-Example:
-
-```bash
-CHROME_PATH=/usr/bin/google-chrome \
-PRERENDER_API=http://127.0.0.1:8000 \
-npm run build
-```
-
-## Frontend Routes
-
-| Route | Purpose |
-| --- | --- |
-| `/` | URL analyzer and report interface |
-| `/how-it-works` | Five-stage analysis walkthrough |
-| `/checks` | Live inventory of checks by category |
-| `/about` | Product principles and analysis boundaries |
-| `/contact` | Contact flow using the visitor's mail client |
-| `/privacy` | Privacy information |
-| `/terms` | Terms of use |
-| anything else | Not-found page |
-
-## Analysis Stages
-
-### Validate and fetch
-
-Before fetching, the backend validates the URL and resolves its hostname. Private, loopback, link-local, and reserved addresses are rejected. The same protection is applied after redirects to prevent a public URL from redirecting into an internal network.
-
-The fetcher enforces a timeout, response-size limit, redirect limit, and explicit User-Agent.
-
-### Parse
-
-The HTML is parsed once into a flat `ParsedPage` object. It contains headings, links, images, metadata, Open Graph tags, response headers, page language, response timing, and other facts used by analyzers.
-
-### Enrich
-
-Optional enrichment runs for domain and contact information:
-
-- RDAP registry information and DNS records
-- registrar, registration and expiry dates
-- nameservers, DNSSEC state, resolved IPs, and inferred provider
-- social profiles, email addresses, and phone numbers
-
-Enrichment failures degrade gracefully and do not fail the complete scan.
-
-### Analyze and score
-
-Analyzers are pure functions over parsed facts. They do not perform network I/O. Each finding has a category, severity, title, explanation, evidence, and recommendation when applicable.
-
-The score is a summary of check results, not a complete quality judgment. A page can pass a presence check while still needing human review.
-
-## What SiteScopia Does Not Do
-
-- It does not execute JavaScript or render a browser DOM.
-- It analyzes one URL and does not crawl linked pages.
-- It does not measure real browser layout shift, contrast rendering, or interaction performance.
-- It does not bypass bot challenges or authentication walls.
-- It does not fetch private, loopback, link-local, reserved, or internal addresses.
+- Only one public URL is analyzed at a time.
+- JavaScript is not executed.
+- Browser-only metrics such as layout shift and rendered contrast are out of scope.
+- The backend does not crawl linked pages.
 - Jobs are stored in memory and disappear when the backend restarts.
-- There is no robots.txt-aware crawler because crawling is not implemented.
+- Render free services may sleep when idle.
 
-If a site is client-rendered, the response may be only an HTML shell. SiteScopia reports that limitation instead of pretending that missing content was found on the original page.
+## License
 
-Bot challenges and error responses finish as `blocked` jobs without scores or findings. This prevents the analyzer from confidently scoring a Cloudflare, WAF, or error page instead of the requested site.
-
-## Project Structure
-
-```text
-webAnaylizer/
-├── backend/
-│   ├── app/
-│   │   ├── main.py              # FastAPI routes
-│   │   ├── config.py            # Environment-backed settings
-│   │   ├── safety.py            # URL validation and SSRF protection
-│   │   ├── fetcher.py           # Network fetcher
-│   │   ├── parser.py            # HTML to ParsedPage
-│   │   ├── pipeline.py          # Analysis orchestration
-│   │   ├── store.py             # In-memory job store
-│   │   ├── interstitial.py      # Bot/error page detection
-│   │   ├── enrichment/          # Domain and contact enrichment
-│   │   └── analyzers/           # SEO, security, accessibility, and other checks
-│   └── requirements.txt
-├── frontend/
-│   ├── src/
-│   │   ├── App.jsx              # Application shell and report flow
-│   │   ├── api.js               # Backend client and polling
-│   │   ├── components/          # Reusable UI pieces
-│   │   └── pages/               # Routed pages
-│   ├── scripts/prerender.mjs
-│   ├── styles.css
-│   └── package.json
-└── README.md
-```
-
-## Add a New Check
-
-Add a pure function to the relevant analyzer module and include it in that module's `CHECKS` list:
-
-```python
-from ..schemas import Finding, Severity
-
-
-def check_favicon(page: ParsedPage) -> list[Finding]:
-    if page.favicon:
-        return []
-    return [
-        finding(
-            Severity.INFO,
-            "No favicon",
-            recommendation="Add a favicon link in the document head.",
-        )
-    ]
-```
-
-The frontend renders the shared finding shape, so a new check does not need a UI change. To add a new category, create an analyzer module, expose its checks through `app/analyzers/__init__.py`, and add its label/color to the frontend status mapping.
-
-## Contact Flow
-
-The contact page does not post messages to the backend. It composes a message in the visitor's own mail client using the configured recipient in `frontend/src/gmail.js`.
-
-- Desktop opens Gmail in a new tab.
-- Android attempts the Gmail app and falls back to Gmail web.
-- iOS attempts the Gmail app and falls back to Gmail web.
-- Visitors without Gmail can use the `mailto:` fallback.
-
-Message bodies are capped at 2,000 characters because the message is passed through a URL.
-
-## Printing Reports
-
-The report's **Download PDF** action uses the browser's native print dialog. There is no PDF backend or PDF dependency. The print stylesheet hides navigation, filters, ads, and interactive controls while keeping the report text selectable.
-
-Use the active findings filter before printing:
-
-- **Issues only** prints warnings, errors, and notes.
-- **All checks** prints passing checks as well.
-
-## Troubleshooting
-
-### The frontend shows a network error
-
-Confirm the backend is running on port `8000` and that `GET /api/health` returns `{"status":"ok"}`. When using a different backend origin in development, update the Vite proxy and `CORS_ORIGINS`.
-
-### The checks page is empty during prerendering
-
-Start the backend before `npm run build`, or set `PRERENDER_API` to a reachable backend URL. The development frontend can still load checks after both servers are running.
-
-### The backend rejects a URL
-
-This is expected for localhost, private IP ranges, loopback addresses, link-local addresses, reserved addresses, and unsafe redirect destinations. SiteScopia is designed to scan public pages only.
-
-### Jobs disappear
-
-The default store is in memory. Jobs are lost whenever the backend restarts. A persistent database or queue is required for production retention and multi-process deployments.
-
-### The prerender step cannot find Chrome
-
-Install a Chromium-based browser or set `CHROME_PATH` to its executable. The Vite build still completes without prerendering, but the generated output will not include the route-specific HTML.
-
-## License and Contributions
-
-This repository does not currently declare a license. Add a license before distributing or accepting external contributions.
-
-For changes, keep analyzer functions free of network I/O, preserve the shared finding schema, and run the relevant build or API checks before opening a pull request.
+This repository does not currently declare a license. Add a license before distributing the project or accepting external contributions.
