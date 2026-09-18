@@ -218,14 +218,20 @@ code {
   min-width: 0;
   width: 100%;
   padding: 14px 14px 14px 2px;
-  border: 0;
-  outline: 0;
+  border: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
   appearance: none;
-  background: none;
+  -webkit-appearance: none;
+  background: transparent !important;
+  background-image: none !important;
+  border-radius: 0;
   color: var(--ink);
   font-size: 15.5px;
 }
-.url-field input:focus { outline: 0; }
+.url-field input:focus,
+.url-field input:focus-visible,
+.url-field input:active { outline: none !important; box-shadow: none !important; }
 
 .url-form button {
   padding: 0 24px;
