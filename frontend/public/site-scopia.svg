@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </radialGradient>
+    <linearGradient id="brandCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2DD4BF" />
+      <stop offset="100%" stop-color="#06B6D4" />
+    </linearGradient>
+    <linearGradient id="accentOrange" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF8A65" />
+      <stop offset="100%" stop-color="#FF5722" />
+    </linearGradient>
+    <linearGradient id="glassCard" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.9" />
+      <stop offset="100%" stop-color="#0F172A" stop-opacity="0.95" />
+    </linearGradient>
+    <linearGradient id="lensReflect" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" stop-opacity="0.3" />
+      <stop offset="50%" stop-color="#38BDF8" stop-opacity="0.05" />
+      <stop offset="100%" stop-color="#818CF8" stop-opacity="0.15" />
+    </linearGradient>
+    <pattern id="scanlines" width="100" height="10" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="100" y2="0" stroke="#38BDF8" stroke-opacity="0.1" stroke-width="1.5" />
+    </pattern>
+    <filter id="neonGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bgGlow)" rx="40" />
+  <g opacity="0.2">
+    <circle cx="250" cy="250" r="210" fill="none" stroke="#475569" stroke-width="1.5" stroke-dasharray="6 10" />
+    <circle cx="250" cy="250" r="150" fill="none" stroke="#334155" stroke-width="1" />
+  </g>
+  <g id="logo-mark" filter="url(#softShadow)">
+    <g id="document-base">
+      <rect x="110" y="80" width="230" height="280" rx="16" fill="url(#glassCard)" stroke="#334155" stroke-width="2.5" />
+      <rect x="132" y="104" width="60" height="10" rx="5" fill="#475569" opacity="0.8" />
+      <circle cx="310" cy="109" r="4" fill="#475569" />
+      <circle cx="322" cy="109" r="4" fill="#475569" opacity="0.5" />
+      <line x1="132" y1="128" x2="322" y2="128" stroke="#334155" stroke-width="1.5" />
+      <rect x="132" y="148" width="140" height="8" rx="4" fill="#334155" opacity="0.5" />
+      <rect x="132" y="166" width="160" height="8" rx="4" fill="#334155" opacity="0.5" />
+      <rect x="132" y="184" width="100" height="8" rx="4" fill="#334155" opacity="0.5" />
+      <rect x="132" y="210" width="186" height="32" rx="6" fill="#FF5722" fill-opacity="0.08" stroke="#FF5722" stroke-opacity="0.3" stroke-width="1.5" stroke-dasharray="4 4" />
+      <rect x="144" y="222" width="75" height="8" rx="4" fill="#FF8A65" opacity="0.7" />
+      <circle cx="302" cy="226" r="5" fill="#FF5722" opacity="0.8" />
+      <rect x="132" y="258" width="150" height="8" rx="4" fill="#334155" opacity="0.5" />
+      <rect x="132" y="276" width="120" height="8" rx="4" fill="#334155" opacity="0.5" />
+      <rect x="132" y="294" width="160" height="8" rx="4" fill="#334155" opacity="0.5" />
+      <rect x="132" y="324" width="80" height="20" rx="6" fill="#334155" opacity="0.4" />
+    </g>
+    <g id="inspection-scope">
+      <path d="M 315 315 L 375 375" stroke="url(#brandCyan)" stroke-width="16" stroke-linecap="round" filter="url(#softShadow)" />
+      <path d="M 315 315 L 375 375" stroke="#0F172A" stroke-width="6" stroke-linecap="round" />
+      <circle cx="245" cy="245" r="95" fill="url(#lensReflect)" stroke="url(#brandCyan)" stroke-width="4.5" filter="url(#neonGlow)" />
+      <circle cx="245" cy="245" r="92" fill="url(#scanlines)" />
+      <circle cx="245" cy="245" r="78" fill="none" stroke="#38BDF8" stroke-width="1.5" stroke-dasharray="3 8" opacity="0.7" />
+      <line x1="245" y1="142" x2="245" y2="155" stroke="#2DD4BF" stroke-width="2.5" />
+      <line x1="245" y1="335" x2="245" y2="348" stroke="#2DD4BF" stroke-width="2.5" />
+      <line x1="142" y1="245" x2="155" y2="245" stroke="#2DD4BF" stroke-width="2.5" />
+      <line x1="335" y1="245" x2="348" y2="245" stroke="#2DD4BF" stroke-width="2.5" />
+      <g filter="url(#neonGlow)">
+        <rect x="178" y="184" width="90" height="8" rx="4" fill="#2DD4BF" />
+        <circle cx="282" cy="188" r="5" fill="#2DD4BF" />
+        <rect x="170" y="210" width="135" height="32" rx="6" fill="#1E293B" stroke="url(#accentOrange)" stroke-width="2" />
+        <rect x="180" y="222" width="70" height="8" rx="4" fill="#FFFFFF" />
+        <path d="M 283 229 L 288 219 L 293 229 Z" fill="#FF8A65" />
+        <circle cx="288" cy="226.5" r="1" fill="#0F172A" />
+        <rect x="175" y="258" width="110" height="8" rx="4" fill="#38BDF8" />
+        <rect x="178" y="276" width="75" height="8" rx="4" fill="#38BDF8" opacity="0.8" />
+      </g>
+      <path d="M 178 178 A 95 95 0 0 1 312 178 A 90 90 0 0 0 178 178 Z" fill="#FFFFFF" opacity="0.18" />
+    </g>
+  </g>
+</svg>
