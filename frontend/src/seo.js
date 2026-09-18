@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-export const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://sitescopia.com'
+export const SITE_URL = import.meta.env.VITE_SITE_URL || 'https://sitescopia.online'
 export const SITE_NAME = 'SiteScopia'
 export const OG_IMAGE = `${SITE_URL}/site-scopia.svg`
 

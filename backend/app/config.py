@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     rdap_timeout: float = 10.0
     domain_lookup_enabled: bool = True
 
-    cors_origins: list[str] = ["http://localhost:5173", "http://127.0.0.1:5173"]
+    cors_origins: list[str] = ["https://sitescopia.online"]
     max_stored_jobs: int = 200
     api_docs_enabled: bool = False
     analysis_rate_limit: int = 10
