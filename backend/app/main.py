@@ -38,7 +38,7 @@ def client_key(request: Request) -> str:
     return request.client.host if request.client else "unknown"
 
 
-@app.get("/api/health")
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 async def health() -> dict[str, str]:
     return {"status": "ok"}
 
