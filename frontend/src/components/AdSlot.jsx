@@ -4,7 +4,11 @@ const FORMATS = {
   inline: { width: null, height: 120, className: 'ad-inline' },
 }
 
+const SHOW_ADVERTISEMENT = import.meta.env.VITE_SHOW_ADVERTISEMENT === 'true'
+
 export default function AdSlot({ format = 'rectangle', sticky = false }) {
+  if (!SHOW_ADVERTISEMENT) return null
+
   const { width, height, className } = FORMATS[format]
 
   return (
