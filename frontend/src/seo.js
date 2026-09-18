@@ -41,10 +41,13 @@ export function useSeo({ title, description, path, noindex = false }) {
     upsertMeta('property', 'og:description', description)
     upsertMeta('property', 'og:url', url)
     upsertMeta('property', 'og:image', OG_IMAGE)
+    upsertMeta('property', 'og:image:alt', 'SiteScopia website analyzer inspection logo')
+    upsertMeta('property', 'og:locale', 'en_US')
 
     upsertMeta('name', 'twitter:card', 'summary_large_image')
     upsertMeta('name', 'twitter:title', fullTitle)
     upsertMeta('name', 'twitter:description', description)
     upsertMeta('name', 'twitter:image', OG_IMAGE)
+    upsertMeta('name', 'twitter:image:alt', 'SiteScopia website analyzer inspection logo')
   }, [title, description, path, noindex])
 }
