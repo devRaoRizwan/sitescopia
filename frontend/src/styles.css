@@ -651,7 +651,7 @@ code {
 
 .finding-body { flex: 1; min-width: 0; }
 .finding-head { display: flex; align-items: baseline; gap: 12px; }
-.finding-head h4 { margin: 0; font-size: 15px; font-weight: 600; }
+.finding-head h4 { min-width: 0; margin: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
 
 .cat {
   display: inline-flex;
@@ -664,6 +664,7 @@ code {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 .cat::before {
   content: '';
@@ -1391,7 +1392,11 @@ code {
 }
 
 @media (max-width: 760px) {
+  .shell { padding-inline: 18px; }
+  .navbar-inner { position: relative; gap: 0; }
+  .brand { min-width: 0; }
   .nav-toggle { display: block; }
+  .nav-toggle { margin-left: auto; }
   .nav-cta { display: none; }
   .nav-links {
     display: none;
@@ -1408,6 +1413,34 @@ code {
   }
   .nav-links.open { display: flex; }
   .nav-links a { padding: 11px 12px; }
+  .footer { padding: 32px 0 16px; }
+  .footer-grid { gap: 22px; }
+  .footer-about p { margin-bottom: 0; }
+  .footer-col li { margin-bottom: 4px; }
+  .footer-bottom { gap: 8px; padding-top: 18px; margin-top: 18px; }
+  .browser { height: auto; overflow: visible; }
+  .browser-toolbar { height: auto; padding: 12px; }
+  .browser-toolbar .result-count { width: 100%; margin-left: 0; }
+  .browser-body { display: block; height: auto; }
+  .browser-rail { border-bottom: 1px solid var(--line); }
+  .rail-head { padding: 12px 12px 8px; }
+  .rail-search { padding: 0 12px 10px; }
+  .rail-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: none;
+    padding: 0 12px 12px;
+    overflow: visible;
+  }
+  .rail-list li { flex: 1 1 120px; min-width: 0; }
+  .rail-item { min-height: 38px; padding: 7px 9px; }
+  .panel-head { align-items: center; justify-content: space-between; padding: 14px 12px 10px; }
+  .panel-list { padding: 0 12px 14px; overflow: visible; }
+  .finding { align-items: flex-start; padding: 14px; }
+  .finding-head { align-items: flex-start; flex-wrap: wrap; gap: 5px 10px; }
+  .finding-head h4 { flex: 1 1 100%; }
+  .cat { margin-left: 0; }
   .field-row { grid-template-columns: 1fr; }
   .stage-list li { grid-template-columns: 1fr; gap: 6px; }
   .about-intro,
