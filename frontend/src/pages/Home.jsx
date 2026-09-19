@@ -82,7 +82,7 @@ export default function Home() {
               </div>
             )}
 
-            {busy && <Progress url={data?.url ?? submit.variables} status={data?.status} />}
+            {busy && <Progress />}
 
             {data?.status === 'failed' && (
               <div className="alert">

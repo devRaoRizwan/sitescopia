@@ -1,19 +1,28 @@
-const MESSAGES = {
-  queued: 'Waiting in the analysis queue.',
-  running: 'Fetching the page and running every check.',
-}
+import { useEffect, useState } from 'react'
 
-export default function Progress({ url, status }) {
-  const title = status === 'queued' ? 'Waiting to start' : status === 'running' ? 'Analyzing' : 'Waiting'
-  const detail = MESSAGES[status] ?? 'Connecting to the analyzer.'
+const MESSAGES = [
+  'Wait a moment',
+  'Almost there',
+  'Checking the details',
+  'Putting your report together',
+]
+
+export default function Progress() {
+  const [messageIndex, setMessageIndex] = useState(0)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setMessageIndex((index) => (index + 1) % MESSAGES.length)
+    }, 2400)
+
+    return () => window.clearInterval(timer)
+  }, [])
 
   return (
     <div className="progress" role="status" aria-live="polite">
       <div className="spinner" aria-hidden="true" />
-      <div>
-        <strong>{title}{url ? ` ${url}` : ''}…</strong>
-        <span className="muted">{detail}</span>
-      </div>
+      <strong>{MESSAGES[messageIndex]}…</strong>
+      <span className="muted">Your report is on its way.</span>
     </div>
   )
 }
