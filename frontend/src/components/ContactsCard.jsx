@@ -4,6 +4,18 @@ const CONFIDENCE_LABEL = {
   low: 'unverified',
 }
 
+const SOCIAL_ICONS = {
+  github: 'GH',
+  instagram: '◎',
+  linkedin: 'in',
+  tiktok: '♪',
+  twitch: '▰',
+  'x (twitter)': 'X',
+  twitter: 'X',
+}
+
+const iconFor = (platform) => SOCIAL_ICONS[platform.toLowerCase()] || platform.slice(0, 2).toUpperCase()
+
 export default function ContactsCard({ contacts }) {
   if (!contacts) return null
 
@@ -23,6 +35,7 @@ export default function ContactsCard({ contacts }) {
             {social.map((profile) => (
               <li key={profile.platform}>
                 <a href={profile.url} target="_blank" rel="noopener noreferrer">
+                  <span className="social-icon" aria-hidden="true">{iconFor(profile.platform)}</span>
                   {profile.platform}
                 </a>
                 {profile.handle && <span className="handle">@{profile.handle}</span>}

@@ -6,8 +6,21 @@ from .enrichment import contacts as contact_extractor
 from .enrichment import domain as domain_lookup
 from .fetcher import FetchError, fetch
 from .parser import parse
+from .schemas import FetchResult
 
 log = logging.getLogger(__name__)
+
+
+def response_block_reason(fetched: FetchResult) -> str | None:
+    if fetched.status == 403:
+        return "The site refused automated access with HTTP 403."
+
+    if fetched.status in {429, 503}:
+        retry_after = fetched.headers.get("retry-after")
+        suffix = f" Retry after {retry_after}." if retry_after else " Please try again later."
+        return f"The site temporarily refused the request with HTTP {fetched.status}.{suffix}"
+
+    return None
 
 
 async def run(job_id: str, url: str) -> None:
@@ -17,6 +30,10 @@ async def run(job_id: str, url: str) -> None:
 
         if blocked := interstitial.detect(fetched):
             store.mark_blocked(job_id, blocked.reason)
+            return
+
+        if reason := response_block_reason(fetched):
+            store.mark_blocked(job_id, reason)
             return
 
         if fetched.status >= 400:
