@@ -70,15 +70,28 @@ export default function FindingsBrowser({ findings, category, onCategory }) {
         <aside className="browser-rail" aria-label="Filter findings by category">
           <div className="rail-head">Category</div>
 
-          <label className="rail-search">
-            <span className="sr-only">Search findings</span>
+          <div className="rail-search">
+            <label className="sr-only" htmlFor="finding-search">
+              Search findings
+            </label>
             <input
+              id="finding-search"
               type="search"
               value={term}
               onChange={(event) => setTerm(event.target.value)}
               placeholder="Search findings…"
             />
-          </label>
+            {term && (
+              <button
+                type="button"
+                className="rail-search-clear"
+                aria-label="Clear search"
+                onClick={() => setTerm('')}
+              >
+                ×
+              </button>
+            )}
+          </div>
 
           <ul className="rail-list">
             <li>
