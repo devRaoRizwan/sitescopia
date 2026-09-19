@@ -1,34 +1,34 @@
 :root {
   color-scheme: light;
 
-  --brand-700: #102b49;
-  --brand-600: #173b63;
-  --brand-500: #28577e;
-  --brand-100: #cddbea;
-  --brand-50: #eef4fa;
+  --brand-700: #111c33;
+  --brand-600: #1b2a4a;
+  --brand-500: #3e5c8a;
+  --brand-100: #d6deea;
+  --brand-50: #eef2f8;
 
-  --page: #f4f7fb;
+  --page: #fafafa;
   --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --line: #d8e1eb;
-  --line-strong: #b8c8d8;
+  --surface-2: #f7f7f7;
+  --line: #ededed;
+  --line-strong: #d5d5d5;
 
-  --ink: #102235;
-  --ink-2: #496174;
-  --muted: #718397;
+  --ink: #161616;
+  --ink-2: #666666;
+  --muted: #666666;
 
   --good: #16803c;
   --warning: #c58a00;
   --serious: #e16b3c;
   --critical: #c9363e;
 
-  --seo: #2a78d6;
-  --accessibility: #eb6834;
-  --security: #1baf7a;
-  --performance: #eda100;
-  --content: #e87ba4;
-  --domain: #008300;
-  --contact: #4a3aa7;
+  --seo: #1b2a4a;
+  --accessibility: #3e5c8a;
+  --security: #5a76a2;
+  --performance: #233a64;
+  --content: #7f94b4;
+  --domain: #333333;
+  --contact: #888888;
 
   --radius: 12px;
   --radius-sm: 8px;
@@ -166,7 +166,7 @@ code {
 .hero {
   padding: 72px 0 60px;
   background:
-    radial-gradient(1100px 460px at 50% -20%, #e6f0f9, transparent 72%),
+    radial-gradient(1100px 460px at 50% -20%, #eef2f8, transparent 72%),
     var(--page);
   border-bottom: 1px solid var(--line);
   text-align: center;
@@ -1072,7 +1072,7 @@ code {
 .page-header {
   padding: 56px 0 40px;
   background:
-    radial-gradient(900px 380px at 12% -25%, #e6f0f9, transparent 72%),
+    radial-gradient(900px 380px at 12% -25%, #eef2f8, transparent 72%),
     var(--page);
   border-bottom: 1px solid var(--line);
 }

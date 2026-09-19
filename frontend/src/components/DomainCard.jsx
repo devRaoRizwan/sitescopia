@@ -20,9 +20,8 @@ export default function DomainCard({ domain }) {
     <section className="insight-card">
       <h3>Domain</h3>
 
-      {domain.lookup_error ? (
-        <p className="insight-empty">{domain.lookup_error}</p>
-      ) : (
+      {domain.lookup_error && <p className="insight-empty">{domain.lookup_error} DNS and hosting data may still be available.</p>}
+      {!domain.lookup_error || domain.ip_addresses.length > 0 || domain.nameservers.length > 0 ? (
         <>
           <div className="domain-name">
             <strong>{domain.domain}</strong>
@@ -75,7 +74,7 @@ export default function DomainCard({ domain }) {
             </div>
           )}
         </>
-      )}
+      ) : null}
     </section>
   )
 }

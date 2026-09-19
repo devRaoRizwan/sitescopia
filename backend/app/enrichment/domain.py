@@ -1,4 +1,5 @@
 import asyncio
+import re
 import socket
 from datetime import datetime, timezone
 from urllib.parse import urlparse
@@ -34,6 +35,11 @@ DNS_PROVIDERS = {
     "name-services.com": "Network Solutions",
 }
 
+WHOIS_SERVERS = {
+    "pk": "whois.pknic.net.pk",
+    "in": "whois.registry.in",
+}
+
 
 def registrable_domain(url: str) -> str:
     host = (urlparse(url).hostname or "").lower().removeprefix("www.")
@@ -49,8 +55,43 @@ def parse_date(value: str | None) -> datetime | None:
     try:
         parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
-        return None
+        try:
+            parsed = datetime.strptime(value[:10], "%Y-%m-%d")
+        except ValueError:
+            return None
     return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+
+
+async def lookup_whois(domain: str) -> dict[str, list[str]]:
+    server = WHOIS_SERVERS.get(domain.rsplit(".", 1)[-1])
+    if not server:
+        return {}
+
+    def query() -> str:
+        with socket.create_connection((server, 43), timeout=settings.rdap_timeout) as connection:
+            connection.sendall(f"{domain}\r\n".encode())
+            chunks = []
+            while True:
+                chunk = connection.recv(4096)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+        return b"".join(chunks).decode("utf-8", "replace")
+
+    text = await asyncio.to_thread(query)
+    fields: dict[str, list[str]] = {}
+    for line in text.splitlines():
+        match = re.match(r"^\s*([^:#]+?)\s*:\s*(.*?)\s*$", line)
+        if match and match.group(2):
+            fields.setdefault(match.group(1).lower(), []).append(match.group(2))
+    return fields
+
+
+def first_field(fields: dict[str, list[str]], *names: str) -> str | None:
+    for name in names:
+        if fields.get(name):
+            return fields[name][0]
+    return None
 
 
 def registrar_name(payload: dict) -> str | None:
@@ -108,7 +149,31 @@ async def lookup(url: str) -> DomainInfo:
         ) as client:
             response = await client.get(f"{RDAP_BASE}/domain/{domain}")
             if response.status_code == 404:
-                info.lookup_error = f"No registry record found for {domain}."
+                try:
+                    fields = await lookup_whois(domain)
+                except (OSError, TimeoutError):
+                    fields = {}
+
+                if fields:
+                    now = datetime.now(timezone.utc)
+                    registered = parse_date(first_field(fields, "creation date", "created on"))
+                    expires = parse_date(first_field(fields, "expiry date", "expiration date", "expires on"))
+                    info.registered_on = registered.date().isoformat() if registered else None
+                    info.expires_on = expires.date().isoformat() if expires else None
+                    info.age_days = (now - registered).days if registered else None
+                    info.expires_in_days = (expires - now).days if expires else None
+                    info.status = fields.get("status", [])
+                    info.nameservers = [
+                        value.lower().rstrip(".")
+                        for key in ("name server", "nameserver")
+                        for value in fields.get(key, [])
+                    ]
+                    info.dns_provider = match_providers(info.nameservers)
+                    if info.ip_addresses:
+                        info.hosting_provider = await lookup_hosting_provider(client, info.ip_addresses[0])
+                    return info
+
+                info.lookup_error = f"No public registry lookup is available for {domain.rsplit('.', 1)[-1]} domains."
                 return info
             if response.status_code != 200:
                 info.lookup_error = f"Registry lookup returned HTTP {response.status_code}."
