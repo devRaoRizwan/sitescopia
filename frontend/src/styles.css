@@ -52,10 +52,11 @@ body {
 #root {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
-main { flex: 1; }
+#root > main { flex: 1 0 auto; }
+#root > .footer { margin-top: auto; }
 
 h1, h2, h3, h4 { letter-spacing: -0.02em; line-height: 1.25; }
 
