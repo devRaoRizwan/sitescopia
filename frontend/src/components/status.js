@@ -1,8 +1,8 @@
 export const STATUS_COLORS = {
-  good: '#0ca30c',
-  warning: '#fab219',
-  serious: '#ec835a',
-  critical: '#d03b3b',
+  good: '#16803c',
+  warning: '#c58a00',
+  serious: '#e16b3c',
+  critical: '#c9363e',
 }
 
 export const SEVERITY_COLORS = {

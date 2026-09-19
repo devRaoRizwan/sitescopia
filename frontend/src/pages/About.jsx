@@ -15,7 +15,7 @@ export default function About() {
       <PageHeader
         eyebrow="About"
         title="A page analyzer that shows its working"
-        lead="Most site auditors hand you a number. This one hands you the evidence, the reason it matters, and the exact fix — and tells you when it could not see enough to judge."
+        lead="Most site auditors hand you a number. This one hands you the evidence, the reason it matters, and the exact fix. It also tells you when it could not see enough to judge."
       />
 
       <section className="section about-editorial">

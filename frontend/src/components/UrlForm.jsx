@@ -1,13 +1,23 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 const EXAMPLES = ['example.com', 'wikipedia.org', 'stripe.com']
 
 export default function UrlForm({ onSubmit, busy, showExamples = false }) {
   const [url, setUrl] = useState('')
+  const inputRef = useRef(null)
 
   const handleSubmit = (event) => {
     event.preventDefault()
     if (url.trim()) onSubmit(url.trim())
+  }
+
+  const handleExampleClick = (example) => {
+    setUrl(example)
+    if (window.matchMedia('(max-width: 680px)').matches) {
+      onSubmit(example)
+      return
+    }
+    inputRef.current?.focus()
   }
 
   return (
@@ -18,6 +28,7 @@ export default function UrlForm({ onSubmit, busy, showExamples = false }) {
             https://
           </span>
           <input
+            ref={inputRef}
             type="text"
             value={url}
             onChange={(event) => setUrl(event.target.value)}
@@ -40,10 +51,7 @@ export default function UrlForm({ onSubmit, busy, showExamples = false }) {
               key={example}
               type="button"
               disabled={busy}
-              onClick={() => {
-                setUrl(example)
-                onSubmit(example)
-              }}
+              onClick={() => handleExampleClick(example)}
             >
               {example}
             </button>

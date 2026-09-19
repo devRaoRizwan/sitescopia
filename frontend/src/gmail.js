@@ -13,7 +13,7 @@ export function buildBody({ name, subject, message }) {
   return [
     message.trim(),
     '',
-    '—',
+    'From SiteScopia',
     `From: ${name.trim() || 'a SiteScopia visitor'}`,
     `Topic: ${subject}`,
     `Sent via SiteScopia · ${window.location.origin}`,

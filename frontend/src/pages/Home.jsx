@@ -16,8 +16,18 @@ const SETTLED = ['done', 'failed', 'blocked']
 
 const STEPS = [
   { step: '01', title: 'We fetch it once', body: 'A single request, with strict limits on time, size and redirects. Private and internal addresses are refused outright.' },
-  { step: '02', title: 'We pull out the facts', body: 'Headings, links, images, metadata and headers — plus a registry and DNS lookup for the domain itself.' },
+  { step: '02', title: 'We pull out the facts', body: 'Headings, links, images, metadata, and headers, plus a registry and DNS lookup for the domain itself.' },
   { step: '03', title: 'Then 34 checks run', body: 'Each one tells you what it found, why it matters and exactly what to change.' },
+]
+
+const CHECK_CATEGORIES = [
+  ['seo', 'Search visibility', 'Titles, descriptions, headings, canonicals and sharing metadata.'],
+  ['accessibility', 'Accessibility', 'Language, image alternatives, viewport settings and heading structure.'],
+  ['security', 'Security', 'HTTPS, protective headers, mixed content and version disclosure.'],
+  ['performance', 'Performance', 'Response time, document size, compression, caching and images.'],
+  ['content', 'Content quality', 'Status codes, redirects, thin content and link structure.'],
+  ['domain', 'Domain signals', 'Registration, expiry, DNS and the domain behind the page.'],
+  ['contact', 'Contact signals', 'Email, phone and social profiles that visitors can use.'],
 ]
 
 export default function Home() {
@@ -72,7 +82,7 @@ export default function Home() {
               </div>
             )}
 
-            {busy && <Progress url={data?.url ?? submit.variables} />}
+            {busy && <Progress url={data?.url ?? submit.variables} status={data?.status} />}
 
             {data?.status === 'failed' && (
               <div className="alert">
@@ -113,20 +123,20 @@ export default function Home() {
           <section className="section section-alt">
             <div className="shell">
               <h2 className="section-title">What we check</h2>
-              <div className="check-grid">
-                {Object.entries(checks.data?.by_category ?? {}).map(([category, items]) => (
-                  <article key={category} className="check-card">
-                    <h3>
-                      <span className={`dot dot-${category}`} aria-hidden="true" />
-                      {CATEGORY_LABELS[category] ?? category}
-                    </h3>
-                    <ul>
-                      {items.slice(0, 5).map((item) => (
-                        <li key={item}>{item}</li>
-                      ))}
-                    </ul>
-                  </article>
-                ))}
+              <div className="category-grid">
+                {CHECK_CATEGORIES.map(([category, title, description]) => {
+                  const count = checks.data?.by_category?.[category]?.length
+                  return (
+                    <article key={category} className="category-card">
+                      <div className="category-card-head">
+                        <span className={`dot dot-${category}`} aria-hidden="true" />
+                        <h3>{title}</h3>
+                        {count != null && <span className="category-card-count">{count}</span>}
+                      </div>
+                      <p>{description}</p>
+                    </article>
+                  )
+                })}
               </div>
               <p className="section-more">
                 <Link to="/checks">See all {checks.data?.total ?? ''} checks →</Link>

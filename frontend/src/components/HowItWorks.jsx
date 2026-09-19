@@ -9,7 +9,7 @@ const STEPS = [
   {
     step: '02',
     title: 'We parse it once',
-    body: 'The HTML becomes a flat set of facts — headings in document order, links resolved to absolute URLs, images, metadata, headers.',
+    body: 'The HTML becomes a flat set of facts: headings in document order, links resolved to absolute URLs, images, metadata, and headers.',
   },
   {
     step: '03',

@@ -25,7 +25,7 @@ export default function Privacy() {
           <h2>Pages we fetch</h2>
           <p>
             We request the page as an ordinary HTTP client, identifying ourselves in the
-            User-Agent header. We fetch only the single URL you give us — no crawling, no forms
+            User-Agent header. We fetch only the single URL you give us. No crawling, no forms
             submitted, nothing written. Content we extract, such as email addresses or phone
             numbers published on the page, is shown back to you in the report and stored only as
             part of that report.

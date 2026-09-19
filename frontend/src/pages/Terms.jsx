@@ -25,7 +25,7 @@ export default function Terms() {
           <h2>What a report is</h2>
           <p>
             Reports are generated automatically from a single HTTP request. They are informational
-            and may be incomplete or wrong — particularly for pages that render content with
+            and may be incomplete or wrong, particularly for pages that render content with
             JavaScript, or sites behind a bot challenge that serve us something other than the
             real page. Nothing here is a security audit, a legal accessibility assessment or a
             compliance certification.

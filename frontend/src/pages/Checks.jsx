@@ -62,7 +62,7 @@ export default function Checks() {
           <div className="callout callout-muted">
             <h2>A note on scores</h2>
             <p>
-              These checks test whether something is present and well-formed — not whether it is
+              These checks test whether something is present and well-formed, not whether it is
               any good. A page with <code>alt="image"</code> on every picture passes the alt-text
               check. Read the findings, and treat the score as a summary rather than a verdict.
             </p>

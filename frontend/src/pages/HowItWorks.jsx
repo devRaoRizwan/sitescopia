@@ -6,7 +6,7 @@ const STAGES = [
   {
     step: '01',
     title: 'Fetch',
-    body: 'A single HTTP request with a 15-second timeout, a 5 MB size cap and a 5-redirect cap. Before anything is fetched the hostname is resolved and rejected if it points at a private, loopback, link-local or reserved address — and again after any redirect, so a redirect cannot smuggle us onto an internal network.',
+    body: 'A single HTTP request with a 15-second timeout, a 5 MB size cap, and a 5-redirect cap. Before anything is fetched, the hostname is resolved and rejected if it points at a private, loopback, link-local, or reserved address. The check runs again after every redirect, so one cannot smuggle us onto an internal network.',
   },
   {
     step: '02',
@@ -42,7 +42,7 @@ export default function HowItWorks() {
     <>
       <PageHeader
         eyebrow="How it works"
-        title="Five stages, one request"
+        title="Five stages. One request."
         lead="Analysis takes seconds, so scans run as background jobs. Here is what happens between submitting a URL and seeing a report."
       />
 
@@ -53,13 +53,16 @@ export default function HowItWorks() {
               <span className="eyebrow">The path from URL to report</span>
               <h2>One clean pass through the page.</h2>
             </div>
-            <p>
-              The scan is deliberately linear. It gathers the facts once, keeps network work at
-              the edges, and lets every check reason over the same snapshot.
-            </p>
+            <div className="workflow-intro-note">
+              <span>Scan logic</span>
+              <p>
+                The scan is deliberately linear. It gathers the facts once, keeps network work at
+                the edges, and lets every check reason over the same snapshot.
+              </p>
+            </div>
           </div>
 
-          <ol className="workflow-stages">
+          <ul className="workflow-stages">
             {STAGES.map(({ step, title, body }) => (
               <li key={step} className="workflow-stage">
                 <span className="workflow-stage-number">{step}</span>
@@ -69,7 +72,7 @@ export default function HowItWorks() {
                 </div>
               </li>
             ))}
-          </ol>
+          </ul>
 
           <div className="workflow-notes">
             <article>

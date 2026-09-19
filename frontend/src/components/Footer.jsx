@@ -32,11 +32,11 @@ export default function Footer() {
         <div className="footer-grid">
           <div className="footer-about">
             <Link className="brand" to="/">
-              <span className="brand-mark" aria-hidden="true" />
+              <img className="brand-mark-image" src="/site-scopia.svg" alt="" />
               <span className="brand-name">SiteScopia</span>
             </Link>
             <p>
-              Point us at any page and we will tell you what is wrong with it — and show you the
+              Point us at any page and we will tell you what is wrong with it. We show you the
               evidence, not just a score.
             </p>
           </div>

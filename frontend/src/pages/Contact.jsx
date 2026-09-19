@@ -44,7 +44,7 @@ export default function Contact() {
       <PageHeader
         eyebrow="Contact"
         title="Get in touch"
-        lead="Questions, bug reports, or a scan that got something wrong — we read everything."
+        lead="Questions, bug reports, or a scan that got something wrong. We read everything."
       />
 
       <section className="section">
@@ -55,7 +55,7 @@ export default function Contact() {
               <div className="notice notice-good">
                 <strong>Your email is opening with the message ready.</strong>
                 <span>
-                  Nothing has been sent yet — review it and press send. If nothing opened, use the
+                  Nothing has been sent yet. Review it and press send. If nothing opened, use the
                   address below.
                 </span>
               </div>
@@ -93,7 +93,7 @@ export default function Contact() {
                 placeholder="If this is about a scan, include the URL you analyzed."
               />
               <small>
-                {form.message.length}/{MESSAGE_MAX} — at least {MESSAGE_MIN} characters
+                {form.message.length}/{MESSAGE_MAX} | at least {MESSAGE_MIN} characters
               </small>
             </label>
 
@@ -102,7 +102,7 @@ export default function Contact() {
             </button>
 
             <p className="form-note">
-              This opens your email with the message ready — nothing is sent until you press send,
+              This opens your email with the message ready. Nothing is sent until you press send,
               and nothing is stored on our servers.
             </p>
 

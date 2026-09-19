@@ -43,7 +43,7 @@ export default function PrintAppendix({ findings, diagnostics = [] }) {
                     {finding.detail && <span className="appendix-detail">{finding.detail}</span>}
                     {finding.evidence && <pre className="appendix-evidence">{finding.evidence}</pre>}
                   </td>
-                  <td className="appendix-fix">{finding.recommendation || '—'}</td>
+                  <td className="appendix-fix">{finding.recommendation || 'N/A'}</td>
                 </tr>
               ))}
             </tbody>

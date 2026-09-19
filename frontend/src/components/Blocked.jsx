@@ -12,7 +12,7 @@ export default function Blocked({ url, reason }) {
         <h3>Why there is no report</h3>
         <p>
           What came back was a challenge or error page, not the site's own content. Scoring it
-          would describe that placeholder — its title, its headings, its headers — and present it
+          would describe that placeholder by its title, headings, and headers, then present it
           as though it were your page. That would be wrong, so we stop here instead.
         </p>
 
@@ -28,7 +28,7 @@ export default function Blocked({ url, reason }) {
       </div>
 
       <p className="blocked-footer">
-        Think this is wrong? <Link to="/contact">Tell us the URL</Link> — false positives are bugs.
+        Think this is wrong? <Link to="/contact">Tell us the URL</Link>. False positives are bugs.
       </p>
     </section>
   )

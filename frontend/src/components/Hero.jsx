@@ -20,11 +20,23 @@ export default function Hero({ onSubmit, busy, compact, checkCount }) {
         <UrlForm onSubmit={onSubmit} busy={busy} showExamples={!compact} />
 
         {!compact && (
-          <p className="hero-meta">
-            <strong>{checkCount ?? 38}</strong> checks across <strong>7</strong> categories
-            <span aria-hidden="true">·</span> most scans finish in about a second
-            <span aria-hidden="true">·</span> nothing is stored
-          </p>
+          <div className="hero-features" aria-label="Scan features">
+            <div className="hero-feature">
+              <span className="hero-feature-label">Coverage</span>
+              <strong>{checkCount ?? 38}</strong>
+              <span>checks across 7 categories</span>
+            </div>
+            <div className="hero-feature">
+              <span className="hero-feature-label">Speed</span>
+              <strong>Quick first pass</strong>
+              <span>built for timely feedback</span>
+            </div>
+            <div className="hero-feature">
+              <span className="hero-feature-label">Privacy</span>
+              <strong>Nothing stored</strong>
+              <span>your scan stays temporary</span>
+            </div>
+          </div>
         )}
       </div>
     </section>
