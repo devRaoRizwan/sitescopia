@@ -38,9 +38,24 @@ export default function UrlForm({ onSubmit, busy, showExamples = false }) {
             autoComplete="url"
           />
         </div>
-        <button type="submit" disabled={busy || !url.trim()}>
-          {busy ? 'Analyzing…' : 'Analyze page'}
-        </button>
+        <div className="url-actions">
+          {url && (
+            <button
+              type="button"
+              className="url-clear"
+              disabled={busy}
+              onClick={() => {
+                setUrl('')
+                inputRef.current?.focus()
+              }}
+            >
+              Clear
+            </button>
+          )}
+          <button className="url-submit" type="submit" disabled={busy || !url.trim()}>
+            Analyze page
+          </button>
+        </div>
       </form>
 
       {showExamples && (

@@ -248,23 +248,41 @@ code {
 .url-field input:focus-visible,
 .url-field input:active { outline: none !important; box-shadow: none !important; }
 
+.url-actions {
+  display: flex;
+  gap: 8px;
+  flex: none;
+}
+
 .url-form button {
-  padding: 0 24px;
-  border: 0;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius);
-  background: var(--brand-600);
-  color: #fff;
+  background: var(--surface);
+  color: var(--ink-2);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
 }
-.url-form button:hover:not(:disabled) { background: var(--brand-700); }
+.url-form .url-submit {
+  min-width: 132px;
+  border-color: var(--brand-600);
+  background: var(--brand-600);
+  color: #fff;
+}
+.url-form .url-clear { min-width: 76px; }
+.url-form button:hover:not(:disabled) { border-color: var(--brand-500); }
+.url-form .url-submit:hover:not(:disabled) { background: var(--brand-700); border-color: var(--brand-700); }
 .url-form button:disabled {
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  color: var(--muted);
+  opacity: 0.62;
   cursor: not-allowed;
+}
+.url-form .url-submit:disabled {
+  background: var(--brand-600);
+  border-color: var(--brand-600);
+  color: #fff;
 }
 
 .hero-features {
@@ -482,16 +500,40 @@ code {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-height: 320px;
+  min-height: 480px;
   padding: 40px 20px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
   text-align: center;
 }
 .progress strong { font-size: 20px; }
 .progress > .muted { font-size: 14px; }
+
+.progress-skeleton {
+  display: grid;
+  gap: 12px;
+  width: min(100%, 760px);
+  margin-top: 18px;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+}
+.skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+  background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.72) 50%, transparent 80%);
+  transform: translateX(-100%);
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+}
+.skeleton-heading { width: 38%; height: 18px; }
+.skeleton-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.skeleton-card { height: 96px; }
+.skeleton-panel { height: 138px; }
+@keyframes skeleton-shimmer { to { transform: translateX(100%); } }
 
 .spinner {
   width: 54px;
@@ -503,6 +545,12 @@ code {
   animation: spin 0.8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.results-loading {
+  grid-template-columns: 1fr;
+  min-height: 560px;
+}
+.results-loading .results-side { display: none; }
 
 .report-head {
   display: flex;
@@ -858,6 +906,8 @@ code {
   .url-form button { padding: 13px 24px; }
   .hero-features { grid-template-columns: 1fr; margin-top: 20px; }
   .hero-feature { min-height: 0; }
+  .skeleton-grid { grid-template-columns: 1fr; }
+  .skeleton-card { height: 58px; }
   .hero-stats { gap: 24px; }
   .tile-hero { grid-column: 1 / -1; }
   .bars li { grid-template-columns: 78px 1fr 28px; }

@@ -51,7 +51,7 @@ export default function App() {
         <Hero onSubmit={analyze} busy={busy} compact={hasSession} />
 
         {hasSession && (
-          <div className="shell results">
+          <div className={busy ? 'shell results results-loading' : 'shell results'}>
             <div className="results-main">
               {submit.isError && (
                 <div className="alert">
