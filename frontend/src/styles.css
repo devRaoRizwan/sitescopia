@@ -497,12 +497,12 @@ code {
 .progress {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   gap: 12px;
   min-height: 480px;
   padding: 40px 20px;
-  text-align: center;
+  text-align: left;
 }
 .progress strong { font-size: 20px; }
 .progress > .muted { font-size: 14px; }
@@ -510,7 +510,7 @@ code {
 .progress-skeleton {
   display: grid;
   gap: 12px;
-  width: min(100%, 760px);
+  width: 100%;
   margin-top: 18px;
 }
 
@@ -529,10 +529,20 @@ code {
   transform: translateX(-100%);
   animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
-.skeleton-heading { width: 38%; height: 18px; }
-.skeleton-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.skeleton-report-head { display: flex; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.skeleton-title { width: 220px; height: 22px; }
+.skeleton-meta { width: 150px; height: 12px; margin-top: 9px; }
+.skeleton-actions { display: flex; gap: 8px; }
+.skeleton-action { width: 112px; height: 38px; }
+.skeleton-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .skeleton-card { height: 96px; }
-.skeleton-panel { height: 138px; }
+.skeleton-insights { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.skeleton-insight { height: 150px; }
+.skeleton-browser { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); }
+.skeleton-browser-toolbar { height: 58px; border: 0; border-radius: 0; }
+.skeleton-browser-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); min-height: 250px; }
+.skeleton-rail { border: 0; border-right: 1px solid var(--line); border-radius: 0; }
+.skeleton-findings { border: 0; border-radius: 0; }
 @keyframes skeleton-shimmer { to { transform: translateX(100%); } }
 
 .spinner {
@@ -908,6 +918,13 @@ code {
   .hero-feature { min-height: 0; }
   .skeleton-grid { grid-template-columns: 1fr; }
   .skeleton-card { height: 58px; }
+  .skeleton-report-head { flex-direction: column; }
+  .skeleton-actions { width: 100%; }
+  .skeleton-action { flex: 1; }
+  .skeleton-insights { grid-template-columns: 1fr; }
+  .skeleton-browser-body { grid-template-columns: 1fr; }
+  .skeleton-rail { min-height: 90px; border-right: 0; border-bottom: 1px solid var(--line); }
+  .skeleton-findings { min-height: 180px; }
   .hero-stats { gap: 24px; }
   .tile-hero { grid-column: 1 / -1; }
   .bars li { grid-template-columns: 78px 1fr 28px; }

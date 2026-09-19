@@ -34,7 +34,7 @@ export default function App() {
   })
 
   const data = job.data
-  const busy = submit.isPending || (data && !SETTLED.includes(data.status))
+  const busy = submit.isPending || Boolean(jobId && (!data || !SETTLED.includes(data.status)))
   const hasSession = Boolean(jobId) || submit.isPending || submit.isError
 
   const analyze = (url) => {
