@@ -17,7 +17,7 @@ def _random_headers() -> dict[str, str]:
     """Generate a realistic browser-like header set with a random User-Agent."""
     ua = random.choice(settings.user_agents)
 
-    # Slight variation in Accept-Language & Accept-Encoding keeps fingerprints different
+    # Slight variation in Accept-Language keeps fingerprints different.
     accept_languages = [
         "en-US,en;q=0.9",
         "en-GB,en;q=0.9",
@@ -29,7 +29,7 @@ def _random_headers() -> dict[str, str]:
         "User-Agent": ua,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
         "Accept-Language": random.choice(accept_languages),
-        "Accept-Encoding": "gzip, deflate, br",
+        "Accept-Encoding": "gzip, deflate",
         "Connection": "keep-alive",
         "Upgrade-Insecure-Requests": "1",
         "Sec-Fetch-Dest": "document",
