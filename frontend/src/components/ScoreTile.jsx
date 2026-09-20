@@ -2,14 +2,6 @@ import { STATUS_COLORS, scoreBand } from './status'
 
 export default function ScoreTile({ label, score, hero = false, errors = 0, warnings = 0, notes = 0 }) {
   const band = scoreBand(score)
-  const statusLabel =
-    band.role === 'good'
-      ? 'Strong foundation'
-      : band.role === 'warning'
-        ? 'Needs attention'
-        : band.role === 'serious'
-          ? 'At risk'
-          : 'Critical issues'
   const issues = errors + warnings + notes
   const issueLabel = issues === 1 ? '1 item to review' : `${issues} items to review`
   const summary =
@@ -21,13 +13,7 @@ export default function ScoreTile({ label, score, hero = false, errors = 0, warn
 
   return (
     <div className={hero ? 'tile tile-hero' : 'tile'}>
-      <div className="score-heading">
-        <span className="tile-label">{label}</span>
-        <span className="score-status" style={{ color: STATUS_COLORS[band.role] }}>
-          <span className="score-status-dot" aria-hidden="true" />
-          {statusLabel}
-        </span>
-      </div>
+      <span className="tile-label">{label}</span>
 
       <div className="score-value-row">
         <span className="tile-value">{score}</span>

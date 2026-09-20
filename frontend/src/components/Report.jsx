@@ -23,6 +23,21 @@ const countBySeverity = (findings) =>
     return counts
   }, {})
 
+const printReport = () => {
+  const originalTitle = document.title
+  document.title = 'sitescopia_report'
+
+  window.addEventListener(
+    'afterprint',
+    () => {
+      document.title = originalTitle
+    },
+    { once: true },
+  )
+
+  window.print()
+}
+
 export default function Report({ result }) {
   const [category, setCategory] = useState('all')
 
@@ -65,7 +80,7 @@ export default function Report({ result }) {
           >
             Visit site ↗
           </a>
-          <button type="button" className="ghost-button" onClick={() => window.print()}>
+          <button type="button" className="ghost-button" onClick={printReport}>
             Download PDF
           </button>
         </div>
