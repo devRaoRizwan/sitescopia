@@ -79,7 +79,14 @@ export default function Report({ result }) {
       </div>
 
       <div className="report-grid">
-        <ScoreTile label="Overall score" score={scores.overall} hero />
+        <ScoreTile
+          label="Overall health"
+          score={scores.overall}
+          hero
+          errors={counts.error || 0}
+          warnings={counts.warning || 0}
+          notes={counts.info || 0}
+        />
         <SeverityDonut counts={counts} total={findings.length} />
         <ScoreBars byCategory={scores.by_category} active={category} onSelect={setCategory} />
         <CategoryBars findings={findings} active={category} onSelect={setCategory} />
@@ -90,7 +97,9 @@ export default function Report({ result }) {
         <ContactsCard contacts={insights.contacts} />
       </div>
 
-      <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
+      <div id="findings">
+        <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
+      </div>
 
       <PrintAppendix findings={findings} diagnostics={diagnostics} />
     </section>
