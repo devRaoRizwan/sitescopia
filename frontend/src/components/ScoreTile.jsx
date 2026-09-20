@@ -1,4 +1,4 @@
-import { STATUS_COLORS, scoreBand } from './status'
+import { scoreBand } from './status'
 
 export default function ScoreTile({ label, score, hero = false, errors = 0, warnings = 0, notes = 0 }) {
   const band = scoreBand(score)
@@ -13,13 +13,15 @@ export default function ScoreTile({ label, score, hero = false, errors = 0, warn
 
   return (
     <div className={hero ? 'tile tile-hero' : 'tile'}>
-      <span className="tile-label">{label}</span>
+      <div className="score-card-head">
+        <span className="tile-label">{label}</span>
+        <span className="score-status">{band.label}</span>
+      </div>
 
       <div className="score-value-row">
         <span className="tile-value">{score}</span>
         <span className="score-denominator">/100</span>
       </div>
-
       <div
         className="meter"
         role="meter"
@@ -28,12 +30,7 @@ export default function ScoreTile({ label, score, hero = false, errors = 0, warn
         aria-valuemax={100}
         aria-label={`${label}: ${score} out of 100`}
       >
-        <span style={{ width: `${score}%`, background: STATUS_COLORS[band.role] }} />
-      </div>
-
-      <div className="score-scale" aria-hidden="true">
-        <span>Needs attention</span>
-        <span>Excellent</span>
+        <span style={{ width: `${score}%` }} />
       </div>
 
       <p className="score-summary">{summary}</p>

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSeo } from '../seo'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
@@ -40,6 +40,8 @@ export default function Home() {
 
   const [jobId, setJobId] = useState(null)
   const [jobToken, setJobToken] = useState(null)
+  const resultsRef = useRef(null)
+  const lastScrolledJobRef = useRef(null)
 
   const submit = useMutation({
     mutationFn: startAnalysis,
@@ -62,6 +64,20 @@ export default function Home() {
   const busy = submit.isPending || Boolean(jobId && (!data || !SETTLED.includes(data.status)))
   const hasSession = Boolean(jobId) || submit.isPending || submit.isError
 
+  useEffect(() => {
+    if (data?.status !== 'done' || lastScrolledJobRef.current === jobId) return
+
+    const frame = window.requestAnimationFrame(() => {
+      resultsRef.current?.scrollIntoView({
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+        block: 'start',
+      })
+      lastScrolledJobRef.current = jobId
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [data?.status, jobId])
+
   const analyze = (url) => {
     setJobId(null)
     setJobToken(null)
@@ -73,7 +89,7 @@ export default function Home() {
       <Hero onSubmit={analyze} busy={busy} compact={hasSession} checkCount={checks.data?.total} />
 
       {hasSession && (
-        <div className={busy ? 'shell results results-loading' : 'shell results'}>
+        <div ref={resultsRef} className={busy ? 'shell results results-loading' : 'shell results'}>
           <div className="results-main">
             {submit.isError && (
               <div className="alert">
