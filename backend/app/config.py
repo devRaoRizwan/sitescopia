@@ -7,6 +7,11 @@ class Settings(BaseSettings):
     fetch_timeout: float = 15.0
     fetch_max_bytes: int = 5 * 1024 * 1024
     fetch_max_redirects: int = 5
+    proxy_cooldown_seconds: float = 60.0
+    proxy_max_attempts: int = 3
+    webshare_api_key: str | None = None
+    webshare_api_url: str = "https://proxy.webshare.io/api/v2/proxy/list/"
+    webshare_proxy_list: str | None = None
     user_agent: str = "SiteScopia/0.1"          # kept as fallback
     rdap_timeout: float = 10.0
     domain_lookup_enabled: bool = True

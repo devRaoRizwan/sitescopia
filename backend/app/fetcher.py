@@ -1,3 +1,4 @@
+import logging
 import random
 import time
 from urllib.parse import urljoin
@@ -5,8 +6,11 @@ from urllib.parse import urljoin
 import httpx
 
 from .config import settings
+from .proxy_manager import ProxyUnavailable, proxy_manager
 from .safety import UnsafeURL, assert_public_host
 from .schemas import FetchResult
+
+log = logging.getLogger(__name__)
 
 
 class FetchError(Exception):
@@ -40,12 +44,14 @@ def _random_headers() -> dict[str, str]:
     }
 
 
-def build_client() -> httpx.AsyncClient:
+def build_client(proxy_url: str | None = None) -> httpx.AsyncClient:
     # No fixed headers here – we set them per request so each call is unique
     return httpx.AsyncClient(
         follow_redirects=False,
         timeout=settings.fetch_timeout,
         max_redirects=settings.fetch_max_redirects,
+        proxy=proxy_url,
+        trust_env=False,
     )
 
 
@@ -60,45 +66,78 @@ async def read_body(response: httpx.Response) -> bytes:
     return b"".join(chunks)
 
 
-async def fetch(url: str) -> FetchResult:
+async def _fetch_once(url: str, proxy_url: str | None) -> FetchResult:
     started = time.perf_counter()
     current_url = url
     redirects: list[str] = []
-    try:
-        async with build_client() as client:
-            for _ in range(settings.fetch_max_redirects + 1):
-                assert_public_host(current_url)
+    async with build_client(proxy_url) as client:
+        for _ in range(settings.fetch_max_redirects + 1):
+            # This runs for the initial URL and every redirect before any request.
+            assert_public_host(current_url)
 
-                # Fresh random headers on every request (including redirects)
-                headers = _random_headers()
+            # Fresh random headers on every request (including redirects)
+            headers = _random_headers()
 
-                async with client.stream("GET", current_url, headers=headers) as response:
-                    if response.is_redirect:
-                        location = response.headers.get("location")
-                        if not location:
-                            raise FetchError("Redirect response had no Location header.")
-                        next_url = urljoin(str(response.url), location)
-                        assert_public_host(next_url)
-                        redirects.append(str(response.url))
-                        current_url = next_url
-                        continue
+            async with client.stream("GET", current_url, headers=headers) as response:
+                if response.is_redirect:
+                    location = response.headers.get("location")
+                    if not location:
+                        raise FetchError("Redirect response had no Location header.")
+                    next_url = urljoin(str(response.url), location)
+                    assert_public_host(next_url)
+                    redirects.append(str(response.url))
+                    current_url = next_url
+                    continue
 
-                    body = await read_body(response)
-                    return FetchResult(
-                        url=str(response.url),
-                        status=response.status_code,
-                        headers={k.lower(): v for k, v in response.headers.items()},
-                        html=body.decode(response.encoding or "utf-8", errors="replace"),
-                        elapsed_ms=int((time.perf_counter() - started) * 1000),
-                        bytes=len(body),
-                        redirects=redirects,
-                    )
-            raise FetchError(f"More than {settings.fetch_max_redirects} redirects.")
-    except UnsafeURL as exc:
-        raise FetchError(str(exc)) from exc
-    except httpx.TimeoutException as exc:
-        raise FetchError(f"Timed out after {settings.fetch_timeout:.0f}s.") from exc
-    except httpx.TooManyRedirects as exc:
-        raise FetchError(f"More than {settings.fetch_max_redirects} redirects.") from exc
-    except httpx.HTTPError as exc:
-        raise FetchError(f"Request failed: {exc}") from exc
+                body = await read_body(response)
+                return FetchResult(
+                    url=str(response.url),
+                    status=response.status_code,
+                    headers={k.lower(): v for k, v in response.headers.items()},
+                    html=body.decode(response.encoding or "utf-8", errors="replace"),
+                    elapsed_ms=int((time.perf_counter() - started) * 1000),
+                    bytes=len(body),
+                    redirects=redirects,
+                )
+        raise FetchError(f"More than {settings.fetch_max_redirects} redirects.")
+
+
+async def fetch(url: str) -> FetchResult:
+    """Fetch through Webshare when configured, with bounded proxy failover."""
+    attempts = settings.proxy_max_attempts if proxy_manager.configured else 1
+    attempts = max(1, attempts)
+
+    for attempt in range(attempts):
+        proxy_url: str | None = None
+        try:
+            proxy_url = await proxy_manager.get_proxy()
+            fetched = await _fetch_once(url, proxy_url)
+            await proxy_manager.mark_succeeded(proxy_url)
+            return fetched
+        except UnsafeURL as exc:
+            raise FetchError(str(exc)) from exc
+        except FetchError:
+            raise
+        except ProxyUnavailable as exc:
+            raise FetchError("No outbound proxy is currently available.") from exc
+        except httpx.TimeoutException as exc:
+            if proxy_url:
+                await proxy_manager.mark_failed(proxy_url)
+                log.warning("Outbound proxy timed out; trying another proxy when available.")
+                if attempt + 1 < attempts:
+                    continue
+            raise FetchError(f"Timed out after {settings.fetch_timeout:.0f}s.") from exc
+        except httpx.TooManyRedirects as exc:
+            raise FetchError(f"More than {settings.fetch_max_redirects} redirects.") from exc
+        except httpx.HTTPError as exc:
+            # Connection-level errors are handled above.  HTTP responses (including
+            # 4xx/5xx) are returned normally by httpx and preserve analyzer behavior.
+            if proxy_url:
+                await proxy_manager.mark_failed(proxy_url)
+                log.warning("Outbound proxy connection failed; trying another proxy when available.")
+                if attempt + 1 < attempts:
+                    continue
+                raise FetchError("Request failed while using an outbound proxy.") from exc
+            raise FetchError(f"Request failed: {exc}") from exc
+
+    raise FetchError("No outbound proxy is currently available.")

@@ -3,6 +3,8 @@ import socket
 from urllib.parse import urlparse, urlunparse
 
 ALLOWED_SCHEMES = {"http", "https"}
+INTERNAL_HOSTNAMES = {"localhost", "localhost.localdomain", "ip6-localhost"}
+INTERNAL_HOST_SUFFIXES = (".localhost", ".local", ".internal", ".home", ".lan")
 
 
 class UnsafeURL(Exception):
@@ -31,6 +33,16 @@ def assert_public_host(url: str) -> None:
     host = urlparse(url).hostname
     if not host:
         raise UnsafeURL("URL has no hostname.")
+
+    host = host.rstrip(".").lower()
+    # Names without a DNS suffix are normally local-search-domain names.  Reject
+    # them before resolution, along with common internal-only hostname suffixes.
+    if (
+        host in INTERNAL_HOSTNAMES
+        or host.endswith(INTERNAL_HOST_SUFFIXES)
+        or "." not in host and ":" not in host
+    ):
+        raise UnsafeURL(f"'{host}' is not a public hostname. Refusing to fetch.")
 
     try:
         addresses = socket.getaddrinfo(host, None)
