@@ -601,8 +601,10 @@ code {
 
 .report-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-rows: 410px;
+  /* The report shares space with the reading sidebar, so adapt to its actual
+     available width rather than forcing four cramped cards. */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-auto-rows: minmax(460px, auto);
   align-items: stretch;
   gap: 18px;
   margin-bottom: 18px;
@@ -717,6 +719,15 @@ code {
 
 .legend-row { display: flex; flex-wrap: wrap; gap: 12px; }
 .legend-row .legend-label { font-size: 12.5px; text-transform: capitalize; }
+
+.chart-stack .legend-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 10px;
+  margin-top: 12px;
+}
+.chart-stack .legend-row li { min-width: 0; padding: 0; }
+.chart-stack .legend-row .legend-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .swatch { width: 11px; height: 11px; border-radius: 3px; flex: none; }
 
@@ -948,7 +959,7 @@ code {
 @media (max-width: 960px) {
   .results { grid-template-columns: 1fr; }
   .report-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
-  .report-grid .tile, .report-grid .chart { min-height: 280px; height: auto; }
+  .report-grid .tile, .report-grid .chart { min-height: 320px; height: auto; }
   .category-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .results-side { flex-direction: row; flex-wrap: wrap; }
   .ad-sticky { position: static; }
