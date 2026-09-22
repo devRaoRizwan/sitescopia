@@ -50,8 +50,11 @@ export default function ContactsCard({ contacts }) {
                   <li key={profile.platform}>
                     <a href={profile.url} target="_blank" rel="noopener noreferrer">
                       <SocialMark platform={profile.platform} />
-                      <span className="social-name">{profile.platform}</span>
-                      {profile.handle && <span className="handle">@{profile.handle}</span>}
+                      <span className="social-body">
+                        <span className="social-name">{profile.platform}</span>
+                        {profile.handle && <span className="social-handle">@{profile.handle}</span>}
+                        <span className="social-url">{profile.url}</span>
+                      </span>
                     </a>
                   </li>
                 ))}

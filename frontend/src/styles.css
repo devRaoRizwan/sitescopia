@@ -1060,19 +1060,6 @@ code {
 
 .insight-block + .insight-block { margin-top: 16px; }
 
-.social-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
-.social-list li {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 11px;
-  border: 1px solid var(--line-strong);
-  border-radius: 999px;
-  background: var(--surface-2);
-  font-size: 13px;
-}
-.social-list .handle { color: var(--muted); font-size: 12px; }
-
 .contact-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .contact-list li { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
 .contact-list a { font-size: 13.5px; word-break: break-all; }
@@ -1111,7 +1098,6 @@ code {
 .ghost-button:hover { border-color: var(--brand-500); color: var(--brand-700); background: var(--brand-50); }
 
 .print-header { display: none; }
-
 
 .narrow { max-width: 860px; }
 .center { text-align: center; }
@@ -1964,12 +1950,6 @@ code {
 .contact-groups { display: grid; gap: 18px; align-content: start; }
 .contact-group { display: grid; gap: 9px; }
 
-.social-icon { width: 16px; height: 16px; flex: none; }
-
-.social-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
-.social-name { font-weight: 550; }
-.social-list .handle { color: var(--muted); font-size: 12px; }
-
 .contact-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
 .contact-list li { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
 .contact-icon { color: var(--muted); flex: none; }
@@ -2176,34 +2156,6 @@ a:hover { color: var(--brand-700); }
 .breakdown-head-score,
 .breakdown-head-count { text-align: right; }
 
-.social-list {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 2px;
-}
-.social-list a {
-  text-decoration: none;
-  color: var(--ink);
-  display: grid;
-  grid-template-columns: 16px minmax(0, auto) minmax(0, 1fr);
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-  padding: 7px 9px;
-  border: 0;
-  border-radius: 7px;
-  background: none;
-}
-.social-list a:hover { background: var(--surface-2); }
-.social-name { font-weight: 550; white-space: nowrap; }
-.social-list .handle {
-  min-width: 0;
-  text-align: right;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .outline ul { display: grid; gap: 2px; }
 .outline li {
   display: grid;
@@ -2275,3 +2227,41 @@ a:hover { color: var(--brand-700); }
 .entry-props > div { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 10px; align-items: baseline; }
 .entry-props dt { color: var(--muted); font-size: 11.5px; }
 .entry-props dd { margin: 0; color: var(--ink-2); font-size: 12.5px; word-break: break-word; }
+
+.social-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 5px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social-list a {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  align-items: start;
+  gap: 11px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--ink);
+  text-decoration: none;
+}
+.social-list a:hover { border-color: var(--line-strong); background: var(--surface); }
+
+.social-icon { width: 16px; height: 16px; flex: none; margin-top: 2px; }
+
+.social-body { display: grid; gap: 2px; min-width: 0; }
+.social-name { font-size: 13.5px; font-weight: 600; line-height: 1.3; }
+.social-handle { color: var(--ink-2); font-size: 12.5px; line-height: 1.3; }
+.social-url {
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
