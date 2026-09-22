@@ -14,6 +14,9 @@ import Terms from './pages/Terms'
 import NotFound from './pages/NotFound'
 import './styles.css'
 
+const LOCAL_HOSTS = ['localhost', '127.0.0.1', '[::1]']
+const trackingEnabled = !LOCAL_HOSTS.includes(window.location.hostname)
+
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
 })
@@ -35,7 +38,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
           </Route>
         </Routes>
       </BrowserRouter>
-      <Analytics />
+      {trackingEnabled && <Analytics />}
     </QueryClientProvider>
   </React.StrictMode>,
 )
