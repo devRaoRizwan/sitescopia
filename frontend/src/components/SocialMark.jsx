@@ -24,6 +24,7 @@ const COLORS = {
   Dribbble: '#ea4c89',
 }
 
+
 export default function SocialMark({ platform }) {
   const Icon = ICONS[platform] ?? FallbackIcon
   return <Icon className="social-icon" style={{ color: COLORS[platform] ?? 'var(--muted)' }} />

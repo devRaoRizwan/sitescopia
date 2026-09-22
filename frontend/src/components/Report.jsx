@@ -121,9 +121,9 @@ export default function Report({ result }) {
       </div>
 
       <div id="findings">
-        <ElementInspector groups={insights.elements} />
+        <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
 
-      <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
+        <ElementInspector groups={insights.elements} />
       </div>
 
       <PrintAppendix findings={findings} elements={insights.elements} diagnostics={diagnostics} />
