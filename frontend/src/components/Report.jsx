@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import ScoreTile from './ScoreTile'
 import SeverityDonut from './SeverityDonut'
-import ScoreBars from './ScoreBars'
-import CategoryBars from './CategoryBars'
+import CategoryBreakdown from './CategoryBreakdown'
 import DomainCard from './DomainCard'
 import ContactsCard from './ContactsCard'
+import StructureCard from './StructureCard'
 import SiteIdentity from './SiteIdentity'
 import FindingsBrowser from './FindingsBrowser'
 import PrintAppendix from './PrintAppendix'
@@ -103,13 +103,18 @@ export default function Report({ result }) {
           notes={counts.info || 0}
         />
         <SeverityDonut counts={counts} total={findings.length} />
-        <ScoreBars byCategory={scores.by_category} active={category} onSelect={setCategory} />
-        <CategoryBars findings={findings} active={category} onSelect={setCategory} />
+        <CategoryBreakdown
+          byCategory={scores.by_category}
+          findings={findings}
+          active={category}
+          onSelect={setCategory}
+        />
       </div>
 
       <div className="insights">
         <DomainCard domain={insights.domain} />
         <ContactsCard contacts={insights.contacts} />
+        <StructureCard structure={insights.structure} />
       </div>
 
       <div id="findings">

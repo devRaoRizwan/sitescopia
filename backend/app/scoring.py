@@ -2,6 +2,8 @@ from dataclasses import asdict
 
 from .schemas import (
     AnalysisResult,
+    HeadingOut,
+    Structure,
     Category,
     CheckOutcome,
     Contacts,
@@ -50,6 +52,31 @@ def score(outcomes: list[CheckOutcome]) -> Scores:
     return Scores(overall=overall, by_category=by_category)
 
 
+MAX_OUTLINE_HEADINGS = 12
+
+
+def build_structure(page: ParsedPage) -> Structure:
+    internal = sum(1 for link in page.links if link.internal)
+    return Structure(
+        headings=[
+            HeadingOut(level=level, text=text[:90])
+            for level, text in page.headings[:MAX_OUTLINE_HEADINGS]
+            if text
+        ],
+        heading_total=len(page.headings),
+        links_internal=internal,
+        links_external=len(page.links) - internal,
+        images=len(page.images),
+        images_without_alt=sum(1 for image in page.images if image.alt is None),
+        scripts=len(page.scripts),
+        inline_scripts=page.inline_script_count,
+        stylesheets=len(page.stylesheets),
+        text_length=page.text_length,
+        word_count=len(page.text_sample.split()) if page.text_sample else 0,
+        lang=page.lang,
+    )
+
+
 def build_result(
     page: ParsedPage,
     outcomes: list[CheckOutcome],
@@ -76,6 +103,7 @@ def build_result(
         insights=Insights(
             domain=asdict(domain_info) if domain_info else None,
             contacts=asdict(contacts) if contacts else None,
+            structure=build_structure(page),
         ),
         diagnostics=diagnostics or [],
     )

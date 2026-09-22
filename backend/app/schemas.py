@@ -175,9 +175,30 @@ class DomainInfoOut(BaseModel):
     lookup_error: str | None
 
 
+class HeadingOut(BaseModel):
+    level: int
+    text: str
+
+
+class Structure(BaseModel):
+    headings: list[HeadingOut] = []
+    heading_total: int = 0
+    links_internal: int = 0
+    links_external: int = 0
+    images: int = 0
+    images_without_alt: int = 0
+    scripts: int = 0
+    inline_scripts: int = 0
+    stylesheets: int = 0
+    text_length: int = 0
+    word_count: int = 0
+    lang: str | None = None
+
+
 class Insights(BaseModel):
     domain: DomainInfoOut | None = None
     contacts: ContactsOut | None = None
+    structure: Structure | None = None
 
 
 class Scores(BaseModel):
