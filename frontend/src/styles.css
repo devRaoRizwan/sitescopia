@@ -1071,18 +1071,6 @@ code {
   background: var(--surface-2);
   font-size: 13px;
 }
-.social-icon {
-  display: inline-grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--brand-600);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1;
-}
 .social-list .handle { color: var(--muted); font-size: 12px; }
 
 .contact-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
@@ -1976,18 +1964,7 @@ code {
 .contact-groups { display: grid; gap: 18px; align-content: start; }
 .contact-group { display: grid; gap: 9px; }
 
-.social-mark {
-  display: inline-grid;
-  place-items: center;
-  width: 22px;
-  height: 22px;
-  flex: none;
-  border-radius: 6px;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1;
-}
+.social-icon { width: 16px; height: 16px; flex: none; }
 
 .social-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
 .social-name { font-weight: 550; }
@@ -2208,7 +2185,7 @@ a:hover { color: var(--brand-700); }
   text-decoration: none;
   color: var(--ink);
   display: grid;
-  grid-template-columns: 22px minmax(0, auto) minmax(0, 1fr);
+  grid-template-columns: 16px minmax(0, auto) minmax(0, 1fr);
   align-items: center;
   gap: 10px;
   min-width: 0;
