@@ -1,10 +1,24 @@
-const ROWS = [
-  { key: 'registrar', label: 'Registrar' },
-  { key: 'registered_on', label: 'Registered' },
-  { key: 'expires_on', label: 'Expires' },
-  { key: 'updated_on', label: 'Last changed' },
-  { key: 'hosting_provider', label: 'Hosting' },
-  { key: 'dns_provider', label: 'DNS' },
+import {
+  BuildingIcon,
+  CalendarIcon,
+  ClockIcon,
+  GlobeIcon,
+  HashIcon,
+  RouteIcon,
+  ServerIcon,
+  ShieldIcon,
+} from './icons'
+
+const REGISTRATION = [
+  { key: 'registrar', label: 'Registrar', Icon: BuildingIcon },
+  { key: 'registered_on', label: 'Registered', Icon: CalendarIcon },
+  { key: 'expires_on', label: 'Expires', Icon: CalendarIcon },
+  { key: 'updated_on', label: 'Updated', Icon: ClockIcon },
+]
+
+const INFRASTRUCTURE = [
+  { key: 'hosting_provider', label: 'Hosting', Icon: ServerIcon },
+  { key: 'dns_provider', label: 'DNS', Icon: RouteIcon },
 ]
 
 const formatAge = (days) => {
@@ -13,49 +27,70 @@ const formatAge = (days) => {
   return years >= 1 ? `${years} year${years === 1 ? '' : 's'} old` : `${days} days old`
 }
 
+const Row = ({ Icon, label, value }) =>
+  value ? (
+    <div className="fact">
+      <Icon className="fact-icon" />
+      <span className="fact-label">{label}</span>
+      <span className="fact-value">{value}</span>
+    </div>
+  ) : null
+
 export default function DomainCard({ domain }) {
   if (!domain) return null
 
+  const age = formatAge(domain.age_days)
+  const hasData = domain.ip_addresses.length > 0 || domain.nameservers.length > 0 || domain.registrar
+
   return (
     <section className="insight-card">
-      <h3>Domain</h3>
+      <h3>
+        <GlobeIcon className="card-icon" />
+        Domain
+      </h3>
 
-      {domain.lookup_error && <p className="insight-empty">{domain.lookup_error} DNS and hosting data may still be available.</p>}
-      {!domain.lookup_error || domain.ip_addresses.length > 0 || domain.nameservers.length > 0 ? (
+      {domain.lookup_error && !hasData ? (
+        <p className="insight-empty">{domain.lookup_error}</p>
+      ) : (
         <>
           <div className="domain-name">
             <strong>{domain.domain}</strong>
-            {formatAge(domain.age_days) && <span className="chip">{formatAge(domain.age_days)}</span>}
-            {domain.dnssec === false && <span className="chip chip-muted">No DNSSEC</span>}
-            {domain.dnssec === true && <span className="chip chip-good">DNSSEC</span>}
+            {age && <span className="chip">{age}</span>}
+            {domain.expires_in_days != null && (
+              <span className="chip chip-muted">renews in {domain.expires_in_days}d</span>
+            )}
+            <span className={domain.dnssec ? 'chip chip-good' : 'chip chip-muted'}>
+              <ShieldIcon width={12} height={12} />
+              {domain.dnssec ? 'DNSSEC' : 'No DNSSEC'}
+            </span>
           </div>
 
-          <dl className="kv">
-            {ROWS.map(({ key, label }) =>
-              domain[key] ? (
-                <div key={key}>
-                  <dt>{label}</dt>
-                  <dd>{domain[key]}</dd>
-                </div>
-              ) : null,
-            )}
-            {domain.expires_in_days != null && (
-              <div>
-                <dt>Renews in</dt>
-                <dd>{domain.expires_in_days} days</dd>
-              </div>
-            )}
-            {domain.ip_addresses.length > 0 && (
-              <div>
-                <dt>IP</dt>
-                <dd>{domain.ip_addresses.slice(0, 2).join(', ')}</dd>
-              </div>
-            )}
-          </dl>
+          {domain.lookup_error && <p className="insight-note">{domain.lookup_error}</p>}
+
+          <div className="fact-columns">
+            <div className="fact-group">
+              <span className="fact-group-title">Registration</span>
+              {REGISTRATION.map(({ key, label, Icon }) => (
+                <Row key={key} Icon={Icon} label={label} value={domain[key]} />
+              ))}
+            </div>
+
+            <div className="fact-group">
+              <span className="fact-group-title">Infrastructure</span>
+              {INFRASTRUCTURE.map(({ key, label, Icon }) => (
+                <Row key={key} Icon={Icon} label={label} value={domain[key]} />
+              ))}
+              <Row
+                Icon={HashIcon}
+                label="IP"
+                value={domain.ip_addresses.slice(0, 2).join(', ')}
+              />
+            </div>
+          </div>
 
           {domain.nameservers.length > 0 && (
-            <div className="ns-list">
-              <span className="kv-label">Nameservers</span>
+            <div className="ns-panel">
+              <span className="fact-group-title">Nameservers</span>
               <ul>
                 {domain.nameservers.slice(0, 4).map((ns) => (
                   <li key={ns}>{ns}</li>
@@ -68,13 +103,13 @@ export default function DomainCard({ domain }) {
             <div className="status-chips">
               {domain.status.slice(0, 4).map((status) => (
                 <span key={status} className="chip chip-muted">
-                  {status}
+                  {status.replace(' prohibited', ' lock')}
                 </span>
               ))}
             </div>
           )}
         </>
-      ) : null}
+      )}
     </section>
   )
 }
