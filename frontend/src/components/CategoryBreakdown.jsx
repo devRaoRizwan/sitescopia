@@ -19,6 +19,13 @@ export default function CategoryBreakdown({ byCategory, findings, active, onSele
         <strong>Tap to filter</strong>
       </figcaption>
 
+      <div className="breakdown-head" aria-hidden="true">
+        <span>Category</span>
+        <span className="breakdown-head-score">Score</span>
+        <span>Issues → passes</span>
+        <span className="breakdown-head-count">Checks</span>
+      </div>
+
       <ul className="breakdown">
         {rows.map(([key, score]) => {
           const band = scoreBand(score)

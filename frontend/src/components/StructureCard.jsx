@@ -58,9 +58,13 @@ export default function StructureCard({ structure }) {
           </span>
           <ul>
             {structure.headings.map((heading, index) => (
-              <li key={`${heading.level}-${index}`} data-level={heading.level}>
-                <span className="outline-level">h{heading.level}</span>
-                <span className="outline-text">{heading.text}</span>
+              <li key={`${heading.level}-${index}`}>
+                <span className="outline-level" data-level={heading.level}>
+                  h{heading.level}
+                </span>
+                <span className="outline-text" style={{ paddingLeft: (heading.level - 1) * 10 }}>
+                  {heading.text}
+                </span>
               </li>
             ))}
           </ul>
