@@ -17,21 +17,21 @@ const crumbs = (url) => {
 }
 
 export default function SearchPreview({ page }) {
-  const title = page.title || '(no title — Google will invent one)'
+  const title = page.title || '(no title, so Google will invent one)'
   const description = page.meta_description
 
   const titleNote =
     !page.title
       ? { tone: 'bad', text: 'No title tag. Google will pick text from the page instead.' }
       : page.title.length > TITLE_LIMIT
-        ? { tone: 'warn', text: `${page.title.length} characters — Google cuts around ${TITLE_LIMIT}, so the end is hidden.` }
-        : { tone: 'good', text: `${page.title.length} characters — fits.` }
+        ? { tone: 'warn', text: `${page.title.length} characters. Google cuts around ${TITLE_LIMIT}, so the end is hidden.` }
+        : { tone: 'good', text: `${page.title.length} characters, fits comfortably.` }
 
   const descriptionNote = !description
     ? { tone: 'warn', text: 'No description. Google will pull a sentence from the page, and it is rarely the one you would choose.' }
     : description.length > DESCRIPTION_LIMIT
-      ? { tone: 'warn', text: `${description.length} characters — Google cuts around ${DESCRIPTION_LIMIT}.` }
-      : { tone: 'good', text: `${description.length} characters — fits.` }
+      ? { tone: 'warn', text: `${description.length} characters. Google cuts around ${DESCRIPTION_LIMIT}.` }
+      : { tone: 'good', text: `${description.length} characters, fits comfortably.` }
 
   return (
     <section className="insight-card search-preview">

@@ -40,7 +40,7 @@ export default function CategoryBreakdown({ byCategory, findings, active, onSele
                 className={isActive ? 'breakdown-row active' : 'breakdown-row'}
                 onClick={() => onSelect(isActive ? 'all' : key)}
                 aria-pressed={isActive}
-                title={`${CATEGORY_LABELS[key]}: ${score}/100 (${band.label}) — ${summary}. Click to filter.`}
+                title={`${CATEGORY_LABELS[key]}: ${score}/100 (${band.label}). ${summary}. Click to filter.`}
               >
                 <span className="breakdown-name">
                   <span className={`dot dot-${key}`} aria-hidden="true" />

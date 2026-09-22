@@ -73,10 +73,17 @@ def describe_service(url: str) -> str:
     return "Unknown purpose"
 
 
-def item(label: str, props: dict[str, str], line: int | None = None, depth: int = 0) -> ElementItem:
+def item(
+    label: str,
+    props: dict[str, str],
+    line: int | None = None,
+    depth: int = 0,
+    alert: bool = False,
+) -> ElementItem:
     return ElementItem(
         line=line,
         depth=depth,
+        alert=alert,
         label=label or "(empty)",
         props={k: v for k, v in props.items() if v},
     )
@@ -87,16 +94,30 @@ def build_outline(soup) -> ElementGroup | None:
     if not tags:
         return None
 
-    items = [
-        item(
-            shorten(tag.get_text(" ", strip=True)) or "(empty heading)",
-            {"Role": HEADING_ROLE[int(tag.name[1])]},
-            tag.sourceline,
-            int(tag.name[1]),
-        )
-        for tag in tags
-    ]
     main_titles = sum(1 for tag in tags if tag.name == "h1")
+    seen_main = 0
+    items = []
+    for tag in tags:
+        level = int(tag.name[1])
+        alert = False
+        if level == 1:
+            seen_main += 1
+            alert = seen_main > 1
+        text = tag.get_text(" ", strip=True)
+        if not text:
+            alert = True
+        items.append(
+            item(
+                shorten(text) or "(empty heading)",
+                {
+                    "Role": HEADING_ROLE[level],
+                    "Problem": "A second main title. Google expects one per page." if level == 1 and seen_main > 1 else ("This heading has no text" if not text else ""),
+                },
+                tag.sourceline,
+                level,
+                alert,
+            )
+        )
     hint = "Google reads these as your page's table of contents and uses them to work out what it is about."
     if main_titles == 0:
         hint = "No main title, so Google has nothing to anchor the page's topic to."
@@ -123,9 +144,9 @@ def build_pictures(soup, base: str) -> ElementGroup | None:
         src = tag.get("src", "")
         alt = tag.get("alt")
         if alt is None:
-            description = "Missing — people using a screen reader are told nothing"
+            description = "Missing, so people using a screen reader are told nothing"
         elif not alt.strip():
-            description = "Marked decorative — screen readers skip it"
+            description = "Marked decorative, so screen readers skip it"
         else:
             description = f'"{shorten(alt, 70)}"'
         items.append(
@@ -133,9 +154,11 @@ def build_pictures(soup, base: str) -> ElementGroup | None:
                 (urlparse(urljoin(base, src)).path.rsplit("/", 1)[-1] or "picture") if src else "(no source)",
                 {
                     "Description": description,
-                    "Reserved space": "Yes" if tag.get("width") and tag.get("height") else "No — the page can jump as it loads",
+                    "Reserved space": "Yes" if tag.get("width") and tag.get("height") else "No, so the page can jump as it loads",
                 },
                 tag.sourceline,
+                0,
+                alt is None,
             )
         )
 
@@ -227,11 +250,19 @@ def build_problem_links(soup, base: str) -> ElementGroup | None:
             continue
         problem = None
         if not text:
-            problem = "No words at all — a screen reader reads out the address instead"
+            problem = "No words at all, so a screen reader reads out the address instead"
         elif text.lower().strip(" .!>→") in {"click here", "here", "read more", "more", "link", "this", "learn more"}:
             problem = "Says nothing about where it goes"
         if problem:
-            items.append(item(text or "(no words)", {"Problem": problem, "Goes to": shorten(urljoin(base, href), 70)}, tag.sourceline))
+            items.append(
+                item(
+                    text or "(no words)",
+                    {"Problem": problem, "Goes to": shorten(urljoin(base, href), 70)},
+                    tag.sourceline,
+                    0,
+                    True,
+                )
+            )
 
     if not items:
         return None
@@ -268,7 +299,11 @@ def build_internal_links(soup, base: str) -> ElementGroup | None:
         return None
 
     items = [
-        item(path, {"Linked from here": str(count), "Wording used": anchors.get(path, "(no words — Google learns nothing)")})
+        item(
+            path,
+            {"Linked from here": str(count), "Wording used": anchors.get(path, "(no words, so Google learns nothing)")},
+            alert=path not in anchors,
+        )
         for path, count in counts.most_common(MAX_PER_GROUP)
     ]
     return ElementGroup(
@@ -291,4 +326,10 @@ def inspect(html: str, base: str) -> list[ElementGroup]:
         build_third_party(soup, base),
         build_problem_links(soup, base),
     ]
-    return [group for group in groups if group]
+    result = []
+    for group in groups:
+        if not group:
+            continue
+        group.alerts = sum(1 for entry in group.items if entry.alert)
+        result.append(group)
+    return result

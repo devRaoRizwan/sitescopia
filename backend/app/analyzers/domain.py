@@ -63,7 +63,7 @@ def check_age(info: DomainInfo) -> list[Finding]:
                 f"Domain is only {plural(info.age_days, 'day')} old",
                 "Very new domains carry less trust with search engines and spam filters.",
                 f"registered {info.registered_on}",
-                "Nothing to fix — expect reputation to build over time.",
+                "Nothing to fix. Reputation builds as the domain ages.",
             )
         ]
     years = info.age_days // 365

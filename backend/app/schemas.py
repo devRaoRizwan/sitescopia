@@ -198,6 +198,7 @@ class Structure(BaseModel):
 class ElementItem(BaseModel):
     line: int | None = None
     depth: int = 0
+    alert: bool = False
     label: str
     props: dict[str, str] = {}
 
@@ -205,6 +206,7 @@ class ElementItem(BaseModel):
 class ElementGroup(BaseModel):
     key: str
     label: str
+    alerts: int = 0
     headline: str = ""
     hint: str = ""
     total: int
