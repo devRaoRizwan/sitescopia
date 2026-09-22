@@ -5,6 +5,7 @@ import CategoryBreakdown from './CategoryBreakdown'
 import DomainCard from './DomainCard'
 import ContactsCard from './ContactsCard'
 import StructureCard from './StructureCard'
+import SearchPreview from './SearchPreview'
 import ElementInspector from './ElementInspector'
 import SiteIdentity from './SiteIdentity'
 import FindingsBrowser from './FindingsBrowser'
@@ -113,6 +114,7 @@ export default function Report({ result }) {
       </div>
 
       <div className="insights">
+        <SearchPreview page={page} />
         <DomainCard domain={insights.domain} />
         <ContactsCard contacts={insights.contacts} />
         <StructureCard structure={insights.structure} />
@@ -124,7 +126,7 @@ export default function Report({ result }) {
       <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
       </div>
 
-      <PrintAppendix findings={findings} diagnostics={diagnostics} />
+      <PrintAppendix findings={findings} elements={insights.elements} diagnostics={diagnostics} />
     </section>
   )
 }

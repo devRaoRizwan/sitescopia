@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 from .schemas import ElementGroup, ElementItem
 
-MAX_PER_GROUP = 40
+MAX_PER_GROUP = 120
 MAX_TEXT = 110
 
 HEADING_ROLE = {
@@ -97,13 +97,20 @@ def build_outline(soup) -> ElementGroup | None:
         for tag in tags
     ]
     main_titles = sum(1 for tag in tags if tag.name == "h1")
-    hint = "This is the table of contents search engines and screen readers build from your page."
+    hint = "Google reads these as your page's table of contents and uses them to work out what it is about."
     if main_titles == 0:
-        hint = "This page has no main title, so readers and search engines have nothing to anchor to."
+        hint = "No main title, so Google has nothing to anchor the page's topic to."
     elif main_titles > 1:
-        hint = f"This page has {main_titles} main titles. One is expected, so the topic reads as split."
+        hint = f"{main_titles} main titles. Google expects one, so the page's topic reads as split."
 
-    return ElementGroup(key="outline", label="Page outline", hint=hint, total=len(items), items=items[:MAX_PER_GROUP])
+    return ElementGroup(
+        key="outline",
+        label="Page outline",
+        headline=f"{len(items)} headings",
+        hint=hint,
+        total=len(items),
+        items=items[:MAX_PER_GROUP],
+    )
 
 
 def build_pictures(soup, base: str) -> ElementGroup | None:
@@ -134,11 +141,18 @@ def build_pictures(soup, base: str) -> ElementGroup | None:
 
     missing = sum(1 for tag in tags if tag.get("alt") is None)
     hint = (
-        f"{missing} of {len(tags)} pictures have no description for screen readers."
+        f"{missing} of {len(tags)} pictures have no description. Google cannot see pictures, so it reads the description to understand them, and they can rank in image search."
         if missing
-        else "Every picture has a description for screen readers."
+        else "Every picture has a description, so Google can understand them and rank them in image search."
     )
-    return ElementGroup(key="pictures", label="Pictures", hint=hint, total=len(items), items=items[:MAX_PER_GROUP])
+    return ElementGroup(
+        key="pictures",
+        label="Pictures",
+        headline=f"{missing} of {len(tags)} need a description" if missing else f"{len(tags)} all described",
+        hint=hint,
+        total=len(items),
+        items=items[:MAX_PER_GROUP],
+    )
 
 
 def build_destinations(soup, base: str) -> ElementGroup | None:
@@ -155,19 +169,20 @@ def build_destinations(soup, base: str) -> ElementGroup | None:
         if not host or registrable(host) == base_domain:
             continue
         counts[host] += 1
-        example.setdefault(host, shorten(tag.get_text(" ", strip=True)) or absolute)
+        example.setdefault(host, shorten(tag.get_text(" ", strip=True)) or "(the link has no words)")
 
     if not counts:
         return None
 
     items = [
-        item(host, {"Links to it": str(count), "First one says": example[host]})
+        item(host, {"Links from this page": str(count), "First link reads": example[host]})
         for host, count in counts.most_common(MAX_PER_GROUP)
     ]
     return ElementGroup(
         key="destinations",
         label="Sites you link to",
-        hint=f"This page sends visitors to {len(counts)} other {'site' if len(counts) == 1 else 'sites'}.",
+        headline=f"{len(counts)} other {'site' if len(counts) == 1 else 'sites'}",
+        hint=f"Every outbound link passes a little of your page's authority to {len(counts)} other {'site' if len(counts) == 1 else 'sites'}. Add rel=\"nofollow\" to any you do not want to vouch for.",
         total=len(counts),
         items=items,
     )
@@ -190,13 +205,14 @@ def build_third_party(soup, base: str) -> ElementGroup | None:
         return None
 
     items = [
-        item(host, {"Files loaded": str(count), "Looks like": describe_service(sample[host])})
+        item(host, {"Files it loads": str(count), "Looks like": describe_service(sample[host])})
         for host, count in counts.most_common(MAX_PER_GROUP)
     ]
     return ElementGroup(
         key="third-party",
         label="Other companies' code",
-        hint=f"{len(counts)} outside {'company runs' if len(counts) == 1 else 'companies run'} code on this page. Each one can slow it down and see your visitors.",
+        headline=f"{len(counts)} outside {'company' if len(counts) == 1 else 'companies'}",
+        hint=f"{len(counts)} outside {'company runs' if len(counts) == 1 else 'companies run'} code here. Each one slows the page down, and page speed is a Google ranking factor.",
         total=len(counts),
         items=items,
     )
@@ -222,9 +238,46 @@ def build_problem_links(soup, base: str) -> ElementGroup | None:
     return ElementGroup(
         key="weak-links",
         label="Links that need words",
-        hint="People who navigate by jumping between links hear only the link text, with none of the surrounding sentence.",
+        headline=f"{len(items)} to reword",
+        hint="Google uses link wording to understand the page being linked to. \"Click here\" tells it nothing, and tells screen reader users nothing either.",
         total=len(items),
         items=items[:MAX_PER_GROUP],
+    )
+
+
+def build_internal_links(soup, base: str) -> ElementGroup | None:
+    base_domain = registrable(host_of(base))
+    counts: Counter[str] = Counter()
+    anchors: dict[str, str] = {}
+
+    for tag in soup.select("a[href]"):
+        href = tag.get("href", "").strip()
+        if href.startswith(("mailto:", "tel:", "javascript:", "#")):
+            continue
+        absolute = urljoin(base, href)
+        host = host_of(absolute)
+        if not host or registrable(host) != base_domain:
+            continue
+        path = urlparse(absolute).path or "/"
+        counts[path] += 1
+        text = shorten(tag.get_text(" ", strip=True), 60)
+        if text and path not in anchors:
+            anchors[path] = text
+
+    if not counts:
+        return None
+
+    items = [
+        item(path, {"Linked from here": str(count), "Wording used": anchors.get(path, "(no words — Google learns nothing)")})
+        for path, count in counts.most_common(MAX_PER_GROUP)
+    ]
+    return ElementGroup(
+        key="internal",
+        label="Your own pages you link to",
+        headline=f"{len(counts)} of your pages",
+        hint="Internal links tell Google which of your pages matter and what they are about. The wording you use is the strongest hint it gets.",
+        total=len(counts),
+        items=items,
     )
 
 
@@ -233,6 +286,7 @@ def inspect(html: str, base: str) -> list[ElementGroup]:
     groups = [
         build_outline(soup),
         build_pictures(soup, base),
+        build_internal_links(soup, base),
         build_destinations(soup, base),
         build_third_party(soup, base),
         build_problem_links(soup, base),

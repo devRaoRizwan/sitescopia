@@ -205,6 +205,7 @@ class ElementItem(BaseModel):
 class ElementGroup(BaseModel):
     key: str
     label: str
+    headline: str = ""
     hint: str = ""
     total: int
     items: list[ElementItem] = []
@@ -229,6 +230,9 @@ class PageInfo(BaseModel):
     bytes: int
     redirects: list[str]
     title: str | None
+    meta_description: str | None = None
+    canonical: str | None = None
+    robots: str | None = None
     site_name: str | None = None
     favicon: str | None = None
 

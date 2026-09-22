@@ -1785,6 +1785,21 @@ code {
   .chart figcaption { font-size: 8pt; margin-bottom: 8px; }
   .chart-note, .bar-row { cursor: default; }
   .print-appendix { display: block; break-before: page; }
+  .page-summary { display: none !important; }
+  .appendix-elements { break-before: page; }
+  .appendix-elements > h2 {
+    margin: 0 0 4px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--ink);
+    font-size: 13pt;
+  }
+  .appendix-hint { margin: 0 0 6px; color: var(--muted); font-size: 8pt; }
+  .appendix-elements-table th:nth-child(1) { width: 9%; }
+  .appendix-elements-table th:nth-child(2) { width: 38%; }
+  .appendix-elements-table th:nth-child(3) { width: 53%; }
+  .appendix-line { color: var(--muted); font-size: 7.5pt; font-variant-numeric: tabular-nums; }
+  .appendix-prop { display: block; font-size: 8pt; color: var(--ink-2); }
+  .appendix-prop em { font-style: normal; color: var(--muted); }
   .print-appendix > h2 {
     margin: 0 0 4px;
     padding-bottom: 6px;
@@ -2265,3 +2280,106 @@ a:hover { color: var(--brand-700); }
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.page-summary {
+  margin-bottom: 24px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.summary-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 12px;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+.summary-head h3 { margin: 0; font-size: 14.5px; }
+.summary-head span { color: var(--muted); font-size: 12.5px; }
+
+.summary-rows { margin: 0; padding: 0; list-style: none; }
+.summary-row + .summary-row { border-top: 1px solid var(--line); }
+
+.summary-trigger {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 14px 20px;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.summary-trigger:hover { background: var(--surface-2); }
+.summary-row.open .summary-trigger { background: var(--brand-50); }
+
+.summary-count {
+  color: var(--brand-700);
+  font-size: 22px;
+  font-weight: 750;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.summary-text { display: grid; gap: 2px; min-width: 0; }
+.summary-label { color: var(--ink); font-size: 14px; font-weight: 600; }
+.summary-hint { color: var(--ink-2); font-size: 12.5px; line-height: 1.5; }
+
+.summary-toggle {
+  flex: none;
+  padding: 5px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink-2);
+  font-size: 12px;
+  font-weight: 550;
+}
+.summary-row.open .summary-toggle { background: var(--brand-600); border-color: var(--brand-600); color: #fff; }
+
+.summary-detail { padding: 4px 20px 18px; background: var(--surface-2); }
+.summary-detail .entry-list { padding: 0; max-height: 420px; }
+.summary-more { margin: 10px 0 0; color: var(--muted); font-size: 12px; }
+
+@media (max-width: 620px) {
+  .summary-trigger { grid-template-columns: 44px minmax(0, 1fr); gap: 12px; }
+  .summary-toggle { display: none; }
+}
+
+.serp {
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+}
+.serp-site { display: flex; align-items: center; gap: 9px; margin-bottom: 9px; }
+.serp-site img { border-radius: 50%; background: #fff; flex: none; }
+.serp-site > div { display: grid; min-width: 0; }
+.serp-name { color: var(--ink); font-size: 12.5px; line-height: 1.3; }
+.serp-crumbs { color: var(--muted); font-size: 11.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.serp-title {
+  margin: 0 0 4px;
+  color: #1a0dab;
+  font-size: 17px;
+  line-height: 1.3;
+  font-weight: 400;
+}
+.serp-description { margin: 0; color: #474747; font-size: 13px; line-height: 1.55; }
+
+.serp-notes { margin: 14px 0 0; display: grid; gap: 7px; }
+.serp-notes > div { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.serp-notes dt { color: var(--muted); font-size: 11.5px; }
+.serp-notes dd { margin: 0; font-size: 12.5px; line-height: 1.5; }
+
+.note-good { color: var(--good); }
+.note-warn { color: #9a6a00; }
+.note-bad { color: var(--critical); }
