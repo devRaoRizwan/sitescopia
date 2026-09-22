@@ -81,6 +81,7 @@ def build_result(
     page: ParsedPage,
     outcomes: list[CheckOutcome],
     diagnostics: list[str] | None = None,
+    elements: list | None = None,
     domain_info: DomainInfo | None = None,
     contacts: Contacts | None = None,
 ) -> AnalysisResult:
@@ -104,6 +105,7 @@ def build_result(
             domain=asdict(domain_info) if domain_info else None,
             contacts=asdict(contacts) if contacts else None,
             structure=build_structure(page),
+            elements=elements or [],
         ),
         diagnostics=diagnostics or [],
     )

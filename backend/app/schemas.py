@@ -195,10 +195,26 @@ class Structure(BaseModel):
     lang: str | None = None
 
 
+class ElementItem(BaseModel):
+    line: int | None = None
+    depth: int = 0
+    label: str
+    props: dict[str, str] = {}
+
+
+class ElementGroup(BaseModel):
+    key: str
+    label: str
+    hint: str = ""
+    total: int
+    items: list[ElementItem] = []
+
+
 class Insights(BaseModel):
     domain: DomainInfoOut | None = None
     contacts: ContactsOut | None = None
     structure: Structure | None = None
+    elements: list[ElementGroup] = []
 
 
 class Scores(BaseModel):

@@ -88,7 +88,7 @@ def extract_links(soup: BeautifulSoup, base: str, base_domain: str) -> list[Link
 
 
 def parse(fetched: FetchResult) -> ParsedPage:
-    soup = BeautifulSoup(fetched.html, "lxml")
+    soup = BeautifulSoup(fetched.html, "html.parser")
     base = fetched.url
     base_domain = registrable_domain(urlparse(base).hostname or "")
 

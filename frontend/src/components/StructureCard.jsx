@@ -47,36 +47,6 @@ export default function StructureCard({ structure }) {
         ))}
       </div>
 
-      {structure.headings.length > 0 ? (
-        <div className="outline">
-          <span className="fact-group-title">
-            Heading outline
-            <em>
-              {structure.heading_total} total
-              {skipped && ' · levels skip'}
-            </em>
-          </span>
-          <ul>
-            {structure.headings.map((heading, index) => (
-              <li key={`${heading.level}-${index}`}>
-                <span className="outline-level" data-level={heading.level}>
-                  h{heading.level}
-                </span>
-                <span className="outline-text" style={{ paddingLeft: (heading.level - 1) * 10 }}>
-                  {heading.text}
-                </span>
-              </li>
-            ))}
-          </ul>
-          {structure.heading_total > structure.headings.length && (
-            <p className="outline-more">
-              + {structure.heading_total - structure.headings.length} more
-            </p>
-          )}
-        </div>
-      ) : (
-        <p className="insight-note">This page has no headings at all.</p>
-      )}
     </section>
   )
 }

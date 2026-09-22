@@ -5,6 +5,7 @@ import CategoryBreakdown from './CategoryBreakdown'
 import DomainCard from './DomainCard'
 import ContactsCard from './ContactsCard'
 import StructureCard from './StructureCard'
+import ElementInspector from './ElementInspector'
 import SiteIdentity from './SiteIdentity'
 import FindingsBrowser from './FindingsBrowser'
 import PrintAppendix from './PrintAppendix'
@@ -118,7 +119,9 @@ export default function Report({ result }) {
       </div>
 
       <div id="findings">
-        <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
+        <ElementInspector groups={insights.elements} />
+
+      <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
       </div>
 
       <PrintAppendix findings={findings} diagnostics={diagnostics} />
