@@ -1,14 +1,20 @@
+import asyncio
 import logging
 
 from . import analyzers, inspector, interstitial, scoring, store
 from .config import settings
 from .enrichment import contacts as contact_extractor
 from .enrichment import domain as domain_lookup
+from .enrichment import links as link_checker
 from .fetcher import FetchError, fetch
 from .parser import parse
 from .schemas import FetchResult
 
 log = logging.getLogger(__name__)
+
+
+async def no_domain():
+    return None
 
 
 def response_block_reason(fetched: FetchResult) -> str | None:
@@ -45,10 +51,13 @@ async def run(job_id: str, url: str) -> None:
 
         page = parse(fetched)
         contacts = contact_extractor.extract(page, fetched.html)
-        domain_info = await domain_lookup.lookup(page.url) if settings.domain_lookup_enabled else None
+        domain_info, link_report = await asyncio.gather(
+            domain_lookup.lookup(page.url) if settings.domain_lookup_enabled else no_domain(),
+            link_checker.verify(page),
+        )
 
         elements = inspector.inspect(fetched.html, page.url)
-        outcomes, diagnostics = analyzers.run_all(page, domain_info, contacts)
+        outcomes, diagnostics = analyzers.run_all(page, domain_info, contacts, link_report)
         store.mark_done(
             job_id,
             scoring.build_result(page, outcomes, diagnostics, elements, domain_info, contacts),

@@ -1,3 +1,4 @@
+from ..enrichment.links import LinkReport
 from ..schemas import (
     CheckOutcome,
     Category,
@@ -6,7 +7,7 @@ from ..schemas import (
     Finding,
     ParsedPage,
 )
-from . import accessibility, contact, content, domain, performance, security, seo
+from . import accessibility, contact, content, domain, links, performance, security, seo
 from .helpers import Check
 
 MODULES = {
@@ -22,6 +23,9 @@ MODULES = {
 ALL_CHECKS: list[Check] = [check for module in MODULES.values() for check in module.CHECKS]
 
 
+LINK_CHECKS = links.CHECKS
+
+
 def subject_for(category: Category, page, domain_info, contacts):
     if category is Category.DOMAIN:
         return None if domain_info is None or domain_info.lookup_error else domain_info
@@ -34,6 +38,7 @@ def run_all(
     page: ParsedPage,
     domain_info: DomainInfo | None = None,
     contacts: Contacts | None = None,
+    link_report: LinkReport | None = None,
 ) -> tuple[list[CheckOutcome], list[str]]:
     outcomes: list[CheckOutcome] = []
     diagnostics: list[str] = []
@@ -57,6 +62,23 @@ def run_all(
                     weight=check.weight,
                 )
             )
+
+    if link_report is not None:
+        for check in LINK_CHECKS:
+            try:
+                findings = check.run(link_report)
+            except Exception as exc:
+                diagnostics.append(f"The {check.label} check could not run: {exc}")
+                continue
+            if findings:
+                outcomes.append(
+                    CheckOutcome(
+                        category=Category.CONTENT,
+                        label=check.label,
+                        findings=findings,
+                        weight=check.weight,
+                    )
+                )
 
     return outcomes, diagnostics
 

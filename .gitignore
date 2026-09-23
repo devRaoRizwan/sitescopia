@@ -7,3 +7,5 @@ dist/
 .env.local
 .DS_Store
 .vscode/
+backend/tests/
+.pytest_cache/

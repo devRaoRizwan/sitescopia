@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     rdap_timeout: float = 10.0
     domain_lookup_enabled: bool = True
 
+    link_check_enabled: bool = True
+    link_check_limit: int = 25
+    link_check_concurrency: int = 8
+    link_check_timeout: float = 6.0
+    link_check_budget: float = 12.0
+
     cors_origins: list[str] = [
         "https://sitescopia.online",
         "https://www.sitescopia.online",

@@ -1,4 +1,4 @@
-import { scoreBand } from './status'
+import { STATUS_COLORS, scoreBand } from './status'
 
 export default function ScoreTile({ label, score, hero = false, errors = 0, warnings = 0, notes = 0 }) {
   const band = scoreBand(score)
@@ -30,7 +30,7 @@ export default function ScoreTile({ label, score, hero = false, errors = 0, warn
         aria-valuemax={100}
         aria-label={`${label}: ${score} out of 100`}
       >
-        <span style={{ width: `${score}%` }} />
+        <span style={{ width: `${score}%`, background: STATUS_COLORS[band.role] }} />
       </div>
 
       <p className="score-summary">{summary}</p>
