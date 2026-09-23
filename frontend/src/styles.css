@@ -2544,7 +2544,7 @@ a { color: var(--brand-600); }
 
 .serp-notes dd { margin: 0; font-size: 12.5px; line-height: 1.5; }
 
-.inspector { margin-bottom: 24px; }
+.inspector { margin-bottom: 0; }
 
 .inspector .browser-toolbar h3 { margin: 0; font-size: 14.5px; }
 
@@ -2784,3 +2784,9 @@ code, pre, .evidence, .ns-panel li, .code-block, .appendix-evidence { font-famil
 .outline-level[data-level='2'] { background: #e3edfa; color: #1b4f8a; }
 
 .entry-line { background: var(--surface-2); color: var(--muted); }
+
+#findings {
+  display: grid;
+  gap: 32px;
+  margin-bottom: 32px;
+}
