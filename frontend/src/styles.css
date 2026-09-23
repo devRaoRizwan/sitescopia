@@ -4,41 +4,42 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
-  --brand-700: #2e1b33;
-  --brand-600: #4a2a4d;
-  --brand-500: #6e4472;
-  --brand-100: #e2d5e4;
-  --brand-50: #f5eff5;
+  --brand-700: #86198f;
+  --brand-600: #a21caf;
+  --brand-500: #c026d3;
+  --brand-100: #f5d0fe;
+  --brand-50: #fdf4ff;
 
-  --gold: #8a6a2f;
-  --gold-soft: #efe4cc;
+  --gold: #b45309;
+  --gold-soft: #fef3c7;
 
-  --page: #f7f4ef;
-  --surface: #fffdfa;
-  --surface-2: #f2ede5;
-  --line: #e8e0d4;
-  --line-strong: #d2c7b6;
+  --page: #faf9f7;
+  --surface: #ffffff;
+  --surface-2: #f5f4f1;
+  --line: #e4e1db;
+  --line-strong: #c9c4ba;
 
-  --ink: #211c18;
-  --ink-2: #574c42;
-  --muted: #7a6e62;
+  --ink: #1c1917;
+  --ink-2: #44403c;
+  --muted: #78716c;
 
-  --critical: #9b2226;
-  --warning: #a85a0d;
-  --serious: #8c6d52;
-  --good: #a39683;
+  --critical: #dc2626;
+  --warning: #ea580c;
+  --warning-ink: #c2410c;
+  --serious: #a21caf;
+  --good: #57534e;
 
-  --seo: #7e3f8f;
-  --accessibility: #c2410c;
-  --security: #a83252;
-  --performance: #b08a46;
-  --content: #b4407e;
-  --domain: #7a4b2a;
-  --contact: #5c4a6e;
+  --seo: #c026d3;
+  --accessibility: #ea580c;
+  --security: #e11d48;
+  --performance: #ca8a04;
+  --content: #db2777;
+  --domain: #b45309;
+  --contact: #86198f;
 
-  --radius: 14px;
-  --radius-sm: 9px;
-  --shadow: 0 1px 2px rgba(33, 28, 24, 0.04), 0 14px 34px rgba(33, 28, 24, 0.07);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(28, 25, 23, 0.06), 0 8px 24px rgba(28, 25, 23, 0.06);
   --shell: 1560px;
 }
 
@@ -103,8 +104,7 @@ code {
   position: sticky;
   top: 0;
   z-index: 50;
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
 
@@ -2577,16 +2577,15 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(820px 560px at 8% 4%, rgba(110, 68, 114, 0.07), transparent 60%),
-    radial-gradient(700px 480px at 92% 18%, rgba(176, 138, 70, 0.08), transparent 58%),
-    radial-gradient(1000px 680px at 50% 100%, rgba(122, 75, 42, 0.05), transparent 62%);
+    radial-gradient(820px 520px at 8% 2%, rgba(162, 28, 175, 0.05), transparent 58%),
+    radial-gradient(700px 460px at 94% 14%, rgba(219, 39, 119, 0.04), transparent 56%);
 }
 
 .hero,
 .page-header {
   background:
-    radial-gradient(1200px 520px at 50% -24%, #fffdf8, transparent 68%),
-    linear-gradient(180deg, #fbf8f3 0%, var(--page) 100%);
+    radial-gradient(1200px 520px at 50% -24%, #ffffff, transparent 68%),
+    linear-gradient(180deg, #fdfcfb 0%, var(--page) 100%);
   border-bottom: 1px solid var(--line);
 }
 
@@ -2598,15 +2597,13 @@ body::before {
 .alert,
 .progress,
 .blocked {
-  background: rgba(255, 253, 250, 0.82);
-  backdrop-filter: blur(20px) saturate(120%);
-  -webkit-backdrop-filter: blur(20px) saturate(120%);
+  background: var(--surface);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  box-shadow: var(--shadow);
 }
 
 .tile-hero {
-  background: linear-gradient(158deg, var(--brand-50) 0%, rgba(255, 253, 250, 0.9) 58%);
+  background: linear-gradient(158deg, var(--brand-50) 0%, var(--surface) 62%);
   border-color: var(--brand-100);
 }
 
@@ -2694,13 +2691,13 @@ a:hover { color: var(--brand-700); }
 
 .note-good { color: var(--ink-2); }
 
-.note-warn { color: var(--warning); }
+.note-warn { color: var(--warning-ink); }
 
 .note-bad { color: var(--critical); }
 
 .pill-error { border-color: var(--critical); color: var(--critical); }
 
-.pill-warning { border-color: var(--warning); color: var(--warning); }
+.pill-warning { border-color: var(--warning); color: var(--warning-ink); }
 
 .pill-pass { border-color: var(--line-strong); color: var(--ink-2); }
 
@@ -2725,10 +2722,10 @@ a:hover { color: var(--brand-700); }
 .serp,
 .ns-panel,
 .entry-list > li,
-.social-list a { background: rgba(255, 253, 250, 0.7); border-color: var(--line); }
+.social-list a { background: var(--surface-2); border-color: var(--line); }
 
 .browser-toolbar,
-.browser-rail { background: rgba(242, 237, 229, 0.6); }
+.browser-rail { background: var(--surface-2); }
 
 /* ---- type stack ---- */
 
@@ -2739,3 +2736,8 @@ code, pre, .evidence, .ns-panel li, .code-block, .appendix-evidence { font-famil
 .social-icon { color: var(--ink); }
 
 @media (max-width: 900px) { .insights { grid-template-columns: 1fr; } }
+
+.finding-warning .sev { color: #fff; }
+.rail-alert { background: #fee2e2; color: var(--critical); }
+.notice-bad { background: #fee2e2; color: var(--critical); }
+.chip-good, .conf-high, .blocked-badge { background: var(--gold-soft); color: var(--gold); }
