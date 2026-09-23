@@ -47,13 +47,16 @@ class Blocked:
     vendor: str | None
     status: int
     signal: str
+    served_by: str = ""
+    
 
     @property
     def reason(self) -> str:
         who = self.vendor or "A bot-protection service"
+        origin = f" Response came from: {self.served_by}." if self.served_by else ""
         return (
             f"{who} served a challenge page instead of the site "
-            f"(HTTP {self.status}). Detected via {self.signal}."
+            f"(HTTP {self.status}). Detected via {self.signal}.{origin}"
         )
 
 
@@ -62,23 +65,31 @@ def title_of(html: str) -> str:
     return match.group(1).strip().lower() if match else ""
 
 
+INTERESTING_HEADERS = ("server", "cf-ray", "x-cache", "via", "x-served-by", "x-amz-cf-pop")
+
+
+def served_by(fetched: FetchResult) -> str:
+    parts = [f"{k}={fetched.headers[k]}" for k in INTERESTING_HEADERS if fetched.headers.get(k)]
+    return ", ".join(parts[:3])
+
+
 def detect(fetched: FetchResult) -> Blocked | None:
     for header, vendor in HEADER_SIGNALS.items():
         if header in fetched.headers:
-            return Blocked(vendor, fetched.status, f"the {header} response header")
+            return Blocked(vendor, fetched.status, f"the {header} response header", served_by(fetched))
 
     head = fetched.html[:60_000]
 
     for pattern, vendor in BODY_SIGNALS:
         if pattern.search(head):
-            return Blocked(vendor, fetched.status, "a challenge script in the page body")
+            return Blocked(vendor, fetched.status, "a challenge script in the page body", served_by(fetched))
 
     title = title_of(head)
     if any(signal in title for signal in TITLE_SIGNALS):
         vendor = "Cloudflare" if "cf-ray" in fetched.headers else None
-        return Blocked(vendor, fetched.status, f"the page title {title!r}")
+        return Blocked(vendor, fetched.status, f"the page title {title!r}", served_by(fetched))
 
     if fetched.status in CHALLENGE_STATUSES and len(fetched.html) < 8_000:
-        return Blocked(None, fetched.status, f"an HTTP {fetched.status} with a near-empty body")
+        return Blocked(None, fetched.status, f"an HTTP {fetched.status} with a near-empty body", served_by(fetched))
 
     return None
