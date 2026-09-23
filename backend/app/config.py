@@ -8,7 +8,8 @@ class Settings(BaseSettings):
     fetch_max_bytes: int = 5 * 1024 * 1024
     fetch_max_redirects: int = 5
     proxy_cooldown_seconds: float = 60.0
-    proxy_max_attempts: int = 3
+    proxy_max_attempts: int = 5
+    proxy_burn_seconds: float = 900.0
     webshare_api_key: str | None = None
     webshare_api_url: str = "https://proxy.webshare.io/api/v2/proxy/list/"
     webshare_proxy_list: str | None = None

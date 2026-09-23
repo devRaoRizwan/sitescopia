@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from . import analyzers, pipeline, store
+from .proxy_manager import proxy_manager
 from .config import settings
 from .rate_limit import SlidingWindowRateLimiter
 from .safety import UnsafeURL, validate
@@ -39,8 +40,8 @@ def client_key(request: Request) -> str:
 
 
 @app.api_route("/api/health", methods=["GET", "HEAD"])
-async def health() -> dict[str, str]:
-    return {"status": "ok"}
+async def health() -> dict:
+    return {"status": "ok", "proxy": await proxy_manager.diagnostics()}
 
 
 @app.post("/api/analyses", status_code=202, response_model=AnalysisJob)

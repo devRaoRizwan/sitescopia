@@ -1,7 +1,7 @@
 import logging
 import random
 import time
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import httpx
 
@@ -108,20 +108,22 @@ async def fetch(url: str) -> FetchResult:
     attempts = settings.proxy_max_attempts if proxy_manager.configured else 1
     attempts = max(1, attempts)
 
+    host = (urlparse(url).hostname or "").lower()
+
     for attempt in range(attempts):
         proxy_url: str | None = None
         try:
-            proxy_url = await proxy_manager.get_proxy()
+            proxy_url = await proxy_manager.get_proxy(host)
             fetched = await _fetch_once(url, proxy_url)
 
             # A challenge page is a valid HTTP response, so httpx never raises.
             # Exit-IP reputation is the main variable, so retry on a fresh one.
             if proxy_url and attempt + 1 < attempts and detect_challenge(fetched):
-                await proxy_manager.mark_failed(proxy_url)
-                log.info("Challenge page returned; retrying through a different proxy.")
+                await proxy_manager.mark_burned(proxy_url, host)
+                log.info("Challenge page returned; retrying through a different exit IP.")
                 continue
 
-            await proxy_manager.mark_succeeded(proxy_url)
+            await proxy_manager.mark_succeeded(proxy_url, host)
             return fetched
         except UnsafeURL as exc:
             raise FetchError(str(exc)) from exc

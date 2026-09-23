@@ -29,6 +29,12 @@ class ProxyManager:
         self._next_index = 0
         self._loaded = False
         self._lock = asyncio.Lock()
+        # host -> {proxy_url: blocked_until}. A proxy burned by one site's WAF is
+        # usually still fine everywhere else, so this is kept per host.
+        self._burned: dict[str, dict[str, float]] = {}
+        self.last_error: str | None = None
+        # host -> proxy_url that last worked, tried first next time.
+        self._sticky: dict[str, str] = {}
 
     @property
     def configured(self) -> bool:
@@ -66,6 +72,7 @@ class ProxyManager:
         if self._proxies:
             log.info("Loaded %d outbound proxies.", len(self._proxies))
         else:
+            self.last_error = "the configured source returned no proxies"
             log.warning("No outbound proxies were returned by the configured source.")
 
     @staticmethod
@@ -81,7 +88,10 @@ class ProxyManager:
             f"@{address}:{port}"
         )
 
-    async def get_proxy(self) -> str | None:
+    def _is_burned(self, host: str, proxy_url: str, now: float) -> bool:
+        return self._burned.get(host, {}).get(proxy_url, 0.0) > now
+
+    async def get_proxy(self, host: str = "") -> str | None:
         if not self.configured:
             return None
 
@@ -89,13 +99,40 @@ class ProxyManager:
             if not self._loaded:
                 await self._load()
             now = time.monotonic()
+
+            sticky = self._sticky.get(host)
+            if sticky and not self._is_burned(host, sticky, now):
+                for proxy in self._proxies:
+                    if proxy.url == sticky and proxy.cooldown_until <= now:
+                        return proxy.url
+
+            for offset in range(len(self._proxies)):
+                index = (self._next_index + offset) % len(self._proxies)
+                proxy = self._proxies[index]
+                if proxy.cooldown_until <= now and not self._is_burned(host, proxy.url, now):
+                    self._next_index = (index + 1) % len(self._proxies)
+                    return proxy.url
+
+            # every proxy is burned for this host; fall back to any healthy one
             for offset in range(len(self._proxies)):
                 index = (self._next_index + offset) % len(self._proxies)
                 proxy = self._proxies[index]
                 if proxy.cooldown_until <= now:
                     self._next_index = (index + 1) % len(self._proxies)
                     return proxy.url
+
         raise ProxyUnavailable("No healthy outbound proxies are available.")
+
+    async def mark_burned(self, proxy_url: str | None, host: str) -> None:
+        """This exit IP was challenged by this host. Avoid it here, keep it elsewhere."""
+        if not proxy_url or not host:
+            return
+        async with self._lock:
+            self._burned.setdefault(host, {})[proxy_url] = (
+                time.monotonic() + settings.proxy_burn_seconds
+            )
+            if self._sticky.get(host) == proxy_url:
+                self._sticky.pop(host, None)
 
     async def mark_failed(self, proxy_url: str) -> None:
         async with self._lock:
@@ -105,14 +142,45 @@ class ProxyManager:
                     log.warning("Outbound proxy temporarily unavailable.")
                     return
 
-    async def mark_succeeded(self, proxy_url: str | None) -> None:
+    async def mark_succeeded(self, proxy_url: str | None, host: str = "") -> None:
         if not proxy_url:
             return
         async with self._lock:
+            if host:
+                self._sticky[host] = proxy_url
             for proxy in self._proxies:
                 if proxy.url == proxy_url:
                     proxy.cooldown_until = 0.0
                     return
+
+
+    async def diagnostics(self) -> dict:
+        """Non-secret view of proxy state, for operational checks."""
+        if not self.configured:
+            return {
+                "configured": False,
+                "source": None,
+                "loaded": 0,
+                "healthy": 0,
+                "last_error": "no WEBSHARE_API_KEY or WEBSHARE_PROXY_LIST set",
+            }
+
+        async with self._lock:
+            if not self._loaded:
+                try:
+                    await self._load()
+                except Exception as exc:
+                    self.last_error = f"{type(exc).__name__}: {exc}"
+
+            now = time.monotonic()
+            healthy = sum(1 for p in self._proxies if p.cooldown_until <= now)
+            return {
+                "configured": True,
+                "source": "list" if settings.webshare_proxy_list else "api",
+                "loaded": len(self._proxies),
+                "healthy": healthy,
+                "last_error": self.last_error,
+            }
 
 
 proxy_manager = ProxyManager()
