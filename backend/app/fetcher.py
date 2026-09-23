@@ -9,6 +9,7 @@ from .config import settings
 from .proxy_manager import ProxyUnavailable, proxy_manager
 from .interstitial import detect as detect_challenge
 from .safety import UnsafeURL, assert_public_host
+from .tls_fetch import fetch_with_browser_tls
 from .schemas import FetchResult
 
 log = logging.getLogger(__name__)
@@ -118,10 +119,18 @@ async def fetch(url: str) -> FetchResult:
 
             # A challenge page is a valid HTTP response, so httpx never raises.
             # Exit-IP reputation is the main variable, so retry on a fresh one.
-            if proxy_url and attempt + 1 < attempts and detect_challenge(fetched):
-                await proxy_manager.mark_burned(proxy_url, host)
-                log.info("Challenge page returned; retrying through a different exit IP.")
-                continue
+            if detect_challenge(fetched):
+                # Same IP, browser TLS: catches edges that fingerprint the handshake.
+                retried = await fetch_with_browser_tls(url, proxy_url)
+                if retried is not None and not detect_challenge(retried):
+                    log.info("Browser TLS fingerprint cleared the challenge.")
+                    await proxy_manager.mark_succeeded(proxy_url, host)
+                    return retried
+
+                if proxy_url and attempt + 1 < attempts:
+                    await proxy_manager.mark_burned(proxy_url, host)
+                    log.info("Challenge page returned; retrying through a different exit IP.")
+                    continue
 
             await proxy_manager.mark_succeeded(proxy_url, host)
             return fetched

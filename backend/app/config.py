@@ -9,6 +9,8 @@ class Settings(BaseSettings):
     fetch_max_redirects: int = 5
     proxy_cooldown_seconds: float = 60.0
     proxy_max_attempts: int = 5
+    tls_impersonation_enabled: bool = True
+    tls_impersonate_profile: str = "chrome131"
     proxy_burn_seconds: float = 900.0
     webshare_api_key: str | None = None
     webshare_api_url: str = "https://proxy.webshare.io/api/v2/proxy/list/"
