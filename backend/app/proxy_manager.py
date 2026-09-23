@@ -35,6 +35,10 @@ class ProxyManager:
         self.last_error: str | None = None
         # host -> proxy_url that last worked, tried first next time.
         self._sticky: dict[str, str] = {}
+        # host -> time until which the provider is known to refuse CONNECT.
+        # This is the provider's own destination blocklist, so it applies to
+        # every proxy in the pool, not to one exit IP.
+        self._tunnel_refused: dict[str, float] = {}
 
     @property
     def configured(self) -> bool:
@@ -96,6 +100,9 @@ class ProxyManager:
             return None
 
         async with self._lock:
+            if self._tunnel_refused.get(host, 0.0) > time.monotonic():
+                return None
+
             if not self._loaded:
                 await self._load()
             now = time.monotonic()
@@ -133,6 +140,13 @@ class ProxyManager:
             )
             if self._sticky.get(host) == proxy_url:
                 self._sticky.pop(host, None)
+
+    async def mark_tunnel_refused(self, host: str) -> None:
+        """The provider blocks this destination. Rotating exit IPs cannot help."""
+        if not host:
+            return
+        async with self._lock:
+            self._tunnel_refused[host] = time.monotonic() + settings.proxy_burn_seconds
 
     async def mark_failed(self, proxy_url: str) -> None:
         async with self._lock:
@@ -179,6 +193,9 @@ class ProxyManager:
                 "source": "list" if settings.webshare_proxy_list else "api",
                 "loaded": len(self._proxies),
                 "healthy": healthy,
+                "blocked_destinations": sorted(
+                    host for host, until in self._tunnel_refused.items() if until > now
+                ),
                 "last_error": self.last_error,
             }
 

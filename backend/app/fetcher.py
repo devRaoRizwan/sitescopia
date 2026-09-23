@@ -104,6 +104,20 @@ async def _fetch_once(url: str, proxy_url: str | None) -> FetchResult:
         raise FetchError(f"More than {settings.fetch_max_redirects} redirects.")
 
 
+async def _fetch_direct(url: str) -> FetchResult:
+    """Last resort when the proxy provider will not reach a host at all."""
+    try:
+        return await _fetch_once(url, None)
+    except UnsafeURL as exc:
+        raise FetchError(str(exc)) from exc
+    except httpx.TimeoutException as exc:
+        raise FetchError(f"Timed out after {settings.fetch_timeout:.0f}s.") from exc
+    except httpx.TooManyRedirects as exc:
+        raise FetchError(f"More than {settings.fetch_max_redirects} redirects.") from exc
+    except httpx.HTTPError as exc:
+        raise FetchError(f"Request failed: {exc}") from exc
+
+
 async def fetch(url: str) -> FetchResult:
     """Fetch through Webshare when configured, with bounded proxy failover."""
     attempts = settings.proxy_max_attempts if proxy_manager.configured else 1
@@ -140,6 +154,17 @@ async def fetch(url: str) -> FetchResult:
             raise
         except ProxyUnavailable as exc:
             raise FetchError("No outbound proxy is currently available.") from exc
+        except httpx.ProxyError as exc:
+            # The provider refused the CONNECT tunnel, so the site was never
+            # contacted.  Its destination blocklist covers the whole pool, so
+            # rotating exit IPs cannot help -- go direct for this host instead.
+            await proxy_manager.mark_tunnel_refused(host)
+            if not settings.proxy_direct_fallback:
+                raise FetchError(
+                    "The outbound proxy will not connect to this host."
+                ) from exc
+            log.info("Outbound proxy refused this destination; fetching directly.")
+            return await _fetch_direct(url)
         except httpx.TimeoutException as exc:
             if proxy_url:
                 await proxy_manager.mark_failed(proxy_url)

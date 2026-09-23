@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     tls_impersonation_enabled: bool = True
     tls_impersonate_profile: str = "chrome131"
     proxy_burn_seconds: float = 900.0
+    proxy_direct_fallback: bool = True
     webshare_api_key: str | None = None
     webshare_api_url: str = "https://proxy.webshare.io/api/v2/proxy/list/"
     webshare_proxy_list: str | None = None
