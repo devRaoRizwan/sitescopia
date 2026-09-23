@@ -33,6 +33,7 @@ export default function ElementInspector({ groups }) {
   if (!groups || groups.length === 0) return null
 
   const group = shown.find((entry) => entry.key === active) ?? shown[0]
+  const outline = group?.key === 'outline'
   const totalShown = shown.reduce((sum, entry) => sum + entry.visible.length, 0)
   const totalAll = groups.reduce((sum, entry) => sum + entry.total, 0)
 
@@ -108,31 +109,46 @@ export default function ElementInspector({ groups }) {
             {group.visible.length === 0 ? (
               <p className="hint panel-empty">Nothing here matches “{term}”.</p>
             ) : (
-              <ul className="entry-list">
-                {group.visible.map((entry, index) => (
-                  <li
-                    key={`${entry.label}-${index}`}
-                    className={entry.alert ? 'entry alert' : 'entry'}
-                    style={entry.depth > 1 ? { marginLeft: (entry.depth - 1) * 16 } : undefined}
-                  >
-                    <div className="entry-head">
-                      <span className="entry-label">{entry.label}</span>
-                      {entry.line != null && (
-                        <span className="entry-line" title="Line in the page source">
-                          line {entry.line}
-                        </span>
+              <ul className={outline ? 'entry-list entry-tree' : 'entry-list'}>
+                {group.visible.map((entry, index) => {
+                  const level = outline ? Math.min(Math.max(entry.depth, 1), 6) : 0
+                  const props = outline
+                    ? Object.entries(entry.props).filter(([key]) => key !== 'Role')
+                    : Object.entries(entry.props)
+
+                  return (
+                    <li
+                      key={`${entry.label}-${index}`}
+                      className={entry.alert ? 'entry alert' : 'entry'}
+                      data-indent={outline ? Math.min(level - 1, 4) : undefined}
+                      style={outline ? { '--indent': Math.min(level - 1, 4) } : undefined}
+                    >
+                      <div className="entry-head">
+                        {outline && (
+                          <span className="entry-level" data-level={level} title={entry.props.Role}>
+                            H{level}
+                          </span>
+                        )}
+                        <span className="entry-label">{entry.label}</span>
+                        {entry.line != null && (
+                          <span className="entry-line" title="Line in the page source">
+                            line {entry.line}
+                          </span>
+                        )}
+                      </div>
+                      {props.length > 0 && (
+                        <dl className="entry-props">
+                          {props.map(([key, value]) => (
+                            <div key={key}>
+                              <dt>{key}</dt>
+                              <dd>{value}</dd>
+                            </div>
+                          ))}
+                        </dl>
                       )}
-                    </div>
-                    <dl className="entry-props">
-                      {Object.entries(entry.props).map(([key, value]) => (
-                        <div key={key}>
-                          <dt>{key}</dt>
-                          <dd>{value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </li>
-                ))}
+                    </li>
+                  )
+                })}
               </ul>
             )}
 

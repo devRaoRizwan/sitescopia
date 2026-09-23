@@ -2441,6 +2441,42 @@ a { color: var(--brand-600); }
   background: var(--surface);
 }
 
+.entry-tree { --indent-step: 26px; }
+
+.entry-tree > li {
+  position: relative;
+  margin-left: calc(var(--indent, 0) * var(--indent-step));
+}
+
+/* The elbow that shows a heading sits under the one above it. */
+.entry-tree > li:not([data-indent="0"])::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  width: calc(var(--indent-step) - 8px);
+  border-top: 1px solid var(--line);
+}
+
+.entry-level {
+  flex: none;
+  min-width: 26px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.entry-level[data-level='1'] { background: var(--brand-600); color: #fff; }
+.entry-level[data-level='2'] { background: var(--brand-100); color: var(--brand-700); }
+
+.entry.alert .entry-level { background: var(--critical); color: #fff; }
+
 .entry-head { display: flex; align-items: baseline; gap: 12px; }
 
 .entry-label { font-size: 13.5px; font-weight: 600; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -2804,6 +2840,19 @@ code, pre, .evidence, .ns-panel li, .code-block, .appendix-evidence { font-famil
 
 @media (max-width: 760px) {
   .browser-toolbar h3 { flex-basis: 100%; }
+
+  /* Inspector categories are sentences, not one-word labels, so they get a
+     row each instead of the two-up wrap the findings rail uses. */
+  .inspector .rail-list li { flex: 1 1 100%; }
+  .rail-item > span:first-of-type { flex: 1; min-width: 0; }
+
+  /* The inspector needs the same mobile treatment .panel-list already gets. */
+  .entry-list { max-height: none; padding: 0 12px 14px; overflow: visible; }
+  .entry-tree { --indent-step: 14px; }
+  .entry-head { flex-wrap: wrap; gap: 4px 9px; }
+  .entry-label { white-space: normal; overflow: visible; overflow-wrap: anywhere; }
+  .entry-props > div { grid-template-columns: 1fr; gap: 1px; }
+  .entry-props dd { font-size: 12px; }
 }
 
 .report-block { display: grid; gap: 14px; }

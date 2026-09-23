@@ -316,6 +316,14 @@ def build_internal_links(soup, base: str) -> ElementGroup | None:
     )
 
 
+def drop_useless_lines(group: ElementGroup) -> None:
+    """Minified pages report one line for everything, which tells nobody anything."""
+    lines = {entry.line for entry in group.items if entry.line is not None}
+    if len(group.items) > 1 and len(lines) <= 1:
+        for entry in group.items:
+            entry.line = None
+
+
 def inspect(html: str, base: str) -> list[ElementGroup]:
     soup = BeautifulSoup(html, "html.parser")
     groups = [
@@ -331,5 +339,6 @@ def inspect(html: str, base: str) -> list[ElementGroup]:
         if not group:
             continue
         group.alerts = sum(1 for entry in group.items if entry.alert)
+        drop_useless_lines(group)
         result.append(group)
     return result
