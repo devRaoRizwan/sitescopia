@@ -2790,3 +2790,16 @@ code, pre, .evidence, .ns-panel li, .code-block, .appendix-evidence { font-famil
   gap: 32px;
   margin-bottom: 32px;
 }
+
+.browser-toolbar h3 {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+.browser-toolbar .segmented { margin-left: 4px; }
+
+@media (max-width: 760px) {
+  .browser-toolbar h3 { flex-basis: 100%; }
+}

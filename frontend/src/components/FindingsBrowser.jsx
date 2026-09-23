@@ -49,6 +49,8 @@ export default function FindingsBrowser({ findings, category, onCategory }) {
   return (
     <section className="browser">
       <div className="browser-toolbar">
+        <h3>What we found</h3>
+
         <div className="segmented">
           {SEVERITY_FILTERS.map(({ key, label }) => (
             <button
