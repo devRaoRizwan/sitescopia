@@ -30,6 +30,9 @@
   --domain: #008300;
   --contact: #4a3aa7;
 
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
   --radius: 12px;
   --radius-sm: 8px;
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 10px 28px rgba(0, 0, 0, 0.06);
@@ -46,7 +49,9 @@ body {
   overflow-x: hidden;
   background: var(--page);
   color: var(--ink);
-  font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -1054,7 +1059,7 @@ code {
 
 .ns-list { margin-top: 16px; }
 .ns-list ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 3px; }
-.ns-list li { font-size: 12.5px; color: var(--ink-2); font-family: ui-monospace, monospace; }
+.ns-list li { font-size: 12.5px; color: var(--ink-2); font-family: var(--font-mono); }
 
 .status-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
 
@@ -1942,7 +1947,7 @@ code {
 .ns-panel ul { margin: 8px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
 .ns-panel li {
   color: var(--ink-2);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-family: var(--font-mono);
   font-size: 12px;
   word-break: break-all;
 }
@@ -2010,14 +2015,14 @@ a:hover { color: var(--brand-700); }
   box-shadow: 0 0 0 3px var(--brand-50);
 }
 
-.url-form button,
+.url-form .url-submit,
 .nav-cta,
 .primary-button {
   background: var(--brand-600);
   border-color: var(--brand-600);
   color: #fff;
 }
-.url-form button:hover:not(:disabled),
+.url-form .url-submit:hover:not(:disabled),
 .nav-cta:hover,
 .primary-button:hover {
   background: var(--brand-700);
@@ -2445,3 +2450,29 @@ body::before {
 .pill-pass { border-color: var(--good); color: var(--good); }
 .conf-high { background: #e8f6ed; color: #126b34; }
 .finding-warning .sev { color: #fff; }
+
+.url-form .url-clear {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--ink-2);
+}
+.url-form .url-clear:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-sans);
+}
+
+code,
+pre,
+.evidence,
+.ns-panel li,
+.code-block,
+.appendix-evidence { font-family: var(--font-mono); }

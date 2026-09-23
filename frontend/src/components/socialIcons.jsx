@@ -29,7 +29,7 @@ const letter = (text, size = 11) => (props) => (
       fontWeight="700"
       fill="currentColor"
       stroke="none"
-      fontFamily="ui-sans-serif, system-ui, sans-serif"
+      fontFamily="inherit"
     >
       {text}
     </text>
