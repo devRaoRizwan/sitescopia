@@ -39,8 +39,6 @@ export default function ElementInspector({ groups }) {
   return (
     <section className="browser inspector">
       <div className="browser-toolbar">
-        <h3>What is on this page</h3>
-
         <div className="segmented">
           {VIEWS.map(({ key, label }) => (
             <button

@@ -121,9 +121,21 @@ export default function Report({ result }) {
       </div>
 
       <div id="findings">
-        <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
+        <div className="report-block">
+          <header className="block-head">
+            <h2>What we found</h2>
+            <p>Every check that ran on this page, with the evidence behind each one.</p>
+          </header>
+          <FindingsBrowser findings={findings} category={category} onCategory={setCategory} />
+        </div>
 
-        <ElementInspector groups={insights.elements} />
+        <div className="report-block">
+          <header className="block-head">
+            <h2>What is on this page</h2>
+            <p>The detail behind the report: headings, links, pictures and outside code.</p>
+          </header>
+          <ElementInspector groups={insights.elements} />
+        </div>
       </div>
 
       <PrintAppendix findings={findings} elements={insights.elements} diagnostics={diagnostics} />

@@ -2805,3 +2805,20 @@ code, pre, .evidence, .ns-panel li, .code-block, .appendix-evidence { font-famil
 @media (max-width: 760px) {
   .browser-toolbar h3 { flex-basis: 100%; }
 }
+
+.report-block { display: grid; gap: 14px; }
+
+.block-head { display: grid; gap: 4px; }
+.block-head h2 {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+.block-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+  max-width: 70ch;
+}
