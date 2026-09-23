@@ -7,6 +7,7 @@ import httpx
 
 from .config import settings
 from .proxy_manager import ProxyUnavailable, proxy_manager
+from .interstitial import detect as detect_challenge
 from .safety import UnsafeURL, assert_public_host
 from .schemas import FetchResult
 
@@ -112,6 +113,14 @@ async def fetch(url: str) -> FetchResult:
         try:
             proxy_url = await proxy_manager.get_proxy()
             fetched = await _fetch_once(url, proxy_url)
+
+            # A challenge page is a valid HTTP response, so httpx never raises.
+            # Exit-IP reputation is the main variable, so retry on a fresh one.
+            if proxy_url and attempt + 1 < attempts and detect_challenge(fetched):
+                await proxy_manager.mark_failed(proxy_url)
+                log.info("Challenge page returned; retrying through a different proxy.")
+                continue
+
             await proxy_manager.mark_succeeded(proxy_url)
             return fetched
         except UnsafeURL as exc:
