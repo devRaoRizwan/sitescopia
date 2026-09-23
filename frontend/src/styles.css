@@ -877,9 +877,11 @@ code {
 }
 
 .segmented button {
-  width: 108px;
+  min-width: 104px;
   height: 36px;
-  padding: 0 15px;
+  padding: 0 16px;
+  white-space: nowrap;
+  line-height: 1;
   border: 0;
   background: none;
   color: var(--ink-2);
