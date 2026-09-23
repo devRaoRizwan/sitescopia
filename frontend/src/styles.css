@@ -4,14 +4,14 @@
   --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
-  --brand-700: #86198f;
-  --brand-600: #a21caf;
-  --brand-500: #c026d3;
-  --brand-100: #f5d0fe;
-  --brand-50: #fdf4ff;
+  --brand-700: #141210;
+  --brand-600: #1f1c1a;
+  --brand-500: #55504b;
+  --brand-100: #dcd8d3;
+  --brand-50: #f6f4f2;
 
-  --gold: #b45309;
-  --gold-soft: #fef3c7;
+  --gold: #a16207;
+  --gold-soft: #fbf0d8;
 
   --page: #faf9f7;
   --surface: #ffffff;
@@ -23,19 +23,22 @@
   --ink-2: #44403c;
   --muted: #78716c;
 
-  --critical: #dc2626;
-  --warning: #ea580c;
-  --warning-ink: #c2410c;
-  --serious: #a21caf;
-  --good: #57534e;
+  --critical: #ef4444;
+  --critical-ink: #dc2626;
+  --warning: #eab308;
+  --warning-ink: #a16207;
+  --serious: #f97316;
+  --serious-ink: #c2410c;
+  --good: #16a34a;
+  --good-ink: #15803d;
 
-  --seo: #c026d3;
-  --accessibility: #ea580c;
-  --security: #e11d48;
-  --performance: #ca8a04;
-  --content: #db2777;
-  --domain: #b45309;
-  --contact: #86198f;
+  --seo: #2a78d6;
+  --accessibility: #eb6834;
+  --security: #1baf7a;
+  --performance: #eda100;
+  --content: #e87ba4;
+  --domain: #008300;
+  --contact: #4a3aa7;
 
   --radius: 12px;
   --radius-sm: 8px;
@@ -174,7 +177,7 @@ code {
   text-decoration: none;
 }
 
-.nav-cta:hover { background: var(--brand-700); }
+.nav-cta:hover { background: var(--brand-700); color: #fff; }
 
 .hero {
   padding: 72px 0 60px;
@@ -1524,7 +1527,7 @@ code {
   cursor: pointer;
 }
 
-.primary-button:hover { background: var(--brand-700); border-color: var(--brand-700); }
+.primary-button:hover { background: var(--brand-700); border-color: var(--brand-700); color: #fff; }
 
 .primary-button:disabled {
   background: var(--surface);
@@ -2577,8 +2580,8 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(820px 520px at 8% 2%, rgba(162, 28, 175, 0.05), transparent 58%),
-    radial-gradient(700px 460px at 94% 14%, rgba(219, 39, 119, 0.04), transparent 56%);
+    radial-gradient(860px 540px at 8% 2%, rgba(31, 28, 26, 0.045), transparent 58%),
+    radial-gradient(720px 470px at 94% 14%, rgba(161, 98, 7, 0.045), transparent 56%);
 }
 
 .hero,
@@ -2644,7 +2647,11 @@ a:hover { color: var(--brand-700); }
 
 .url-form .url-submit:hover:not(:disabled),
 .nav-cta:hover,
-.primary-button:hover { background: var(--brand-700); border-color: var(--brand-700); }
+.primary-button:hover {
+  background: var(--brand-700);
+  border-color: var(--brand-700);
+  color: #fff;
+}
 
 .url-form .url-clear {
   background: var(--surface);
@@ -2741,3 +2748,17 @@ code, pre, .evidence, .ns-panel li, .code-block, .appendix-evidence { font-famil
 .rail-alert { background: #fee2e2; color: var(--critical); }
 .notice-bad { background: #fee2e2; color: var(--critical); }
 .chip-good, .conf-high, .blocked-badge { background: var(--gold-soft); color: var(--gold); }
+
+/* report semantics use the traffic-light palette; chrome stays charcoal */
+.note-good { color: var(--good-ink); }
+.note-warn { color: var(--warning-ink); }
+.note-bad { color: var(--critical-ink); }
+.pill-error { border-color: var(--critical); color: var(--critical-ink); }
+.pill-warning { border-color: var(--warning); color: var(--warning-ink); }
+.pill-pass { border-color: var(--good); color: var(--good-ink); }
+.rail-alert { background: #fee2e2; color: var(--critical-ink); }
+.notice-good { background: #dcfce7; color: var(--good-ink); }
+.notice-bad { background: #fee2e2; color: var(--critical-ink); }
+.chip-good, .conf-high { background: #dcfce7; color: var(--good-ink); }
+.blocked-badge { background: #fef9c3; color: var(--warning-ink); }
+.finding-warning .sev { color: #3f2d00; }
