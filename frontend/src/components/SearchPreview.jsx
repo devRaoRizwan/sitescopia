@@ -36,7 +36,7 @@ export default function SearchPreview({ page }) {
   return (
     <section className="insight-card search-preview">
       <h3>
-        <SearchIcon className="card-icon" />
+        <SearchIcon className="card-icon icon-seo" />
         How this looks in Google
       </h3>
 

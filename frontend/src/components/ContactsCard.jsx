@@ -24,7 +24,7 @@ export default function ContactsCard({ contacts }) {
   return (
     <section className="insight-card">
       <h3>
-        <UsersIcon className="card-icon" />
+        <UsersIcon className="card-icon icon-contact" />
         Contact &amp; social
       </h3>
 

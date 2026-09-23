@@ -33,7 +33,7 @@ export default function StructureCard({ structure }) {
   return (
     <section className="insight-card">
       <h3>
-        <FileIcon className="card-icon" />
+        <FileIcon className="card-icon icon-content" />
         Page structure
       </h3>
 

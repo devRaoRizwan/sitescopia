@@ -2762,3 +2762,25 @@ code, pre, .evidence, .ns-panel li, .code-block, .appendix-evidence { font-famil
 .chip-good, .conf-high { background: #dcfce7; color: var(--good-ink); }
 .blocked-badge { background: #fef9c3; color: var(--warning-ink); }
 .finding-warning .sev { color: #3f2d00; }
+
+/* body content may carry colour; the surrounding chrome stays charcoal */
+.icon-seo { color: var(--seo); }
+.icon-domain { color: var(--domain); }
+.icon-contact { color: var(--contact); }
+.icon-content { color: var(--content); }
+.icon-accessibility { color: var(--accessibility); }
+
+.social-icon { color: inherit; }
+
+.structure-stat .fact-icon { color: var(--seo); }
+.structure-stat:nth-child(2) .fact-icon { color: var(--accessibility); }
+.structure-stat:nth-child(3) .fact-icon { color: var(--content); }
+.structure-stat:nth-child(4) .fact-icon { color: var(--performance); }
+
+.fact-group:nth-child(1) .fact-icon { color: var(--domain); }
+.fact-group:nth-child(2) .fact-icon { color: var(--security); }
+
+.outline-level[data-level='1'] { background: var(--seo); color: #fff; }
+.outline-level[data-level='2'] { background: #e3edfa; color: #1b4f8a; }
+
+.entry-line { background: var(--surface-2); color: var(--muted); }

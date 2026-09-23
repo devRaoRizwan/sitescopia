@@ -45,7 +45,7 @@ export default function DomainCard({ domain }) {
   return (
     <section className="insight-card">
       <h3>
-        <GlobeIcon className="card-icon" />
+        <GlobeIcon className="card-icon icon-domain" />
         Domain
       </h3>
 
